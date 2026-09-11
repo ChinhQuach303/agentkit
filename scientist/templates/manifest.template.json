@@ -1,0 +1,22 @@
+{
+  "model_id": "model-candidate-v1",
+  "version": "1.0.0",
+  "created_at": "2026-09-11T00:00:00Z",
+  "git_commit": "HEAD",
+  "feature_contract_version": "1.0.0",
+  "dataset_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "metrics_summary": {
+    "aggregate": {"loss": 0.082, "accuracy": 0.945},
+    "slices": {
+      "slice_a": {"metric": 0.932},
+      "slice_b": {"metric": 0.951}
+    }
+  },
+  "files": [
+    {
+      "path": "model.onnx",
+      "size_bytes": 1048576,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

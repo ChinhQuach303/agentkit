@@ -1,0 +1,11 @@
+{
+  "dataset_name": "sample_features",
+  "version": "1.0.0",
+  "primary_keys": ["entity_id", "timestamp"],
+  "temporal_column": "timestamp",
+  "columns": {
+    "entity_id": {"type": "string", "nullable": false},
+    "timestamp": {"type": "datetime", "nullable": false},
+    "feature_metric": {"type": "float64", "nullable": false, "min": 0.0, "max": 1000.0}
+  }
+}

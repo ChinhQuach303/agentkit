@@ -1,0 +1,32 @@
+{
+  "scientist-safety-hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "description": "Guard against destructive SQL on production/warehouse tables or data loss",
+        "guard_patterns": [
+          "DROP TABLE.*(prod|production)",
+          "DROP DATABASE",
+          "TRUNCATE.*(prod|production)",
+          "rm -rf /data",
+          "aws s3 rm.*--recursive.*prod"
+        ]
+      }
+    ],
+    "PrePromotion": [
+      {
+        "description": "Verify bundle manifest and HMAC signature before production promotion",
+        "required_files": [
+          "manifest.json",
+          "manifest.json.sig"
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "description": "Mandatory Engram session summary check",
+        "action": "mem_session_summary"
+      }
+    ]
+  }
+}

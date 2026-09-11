@@ -1,0 +1,196 @@
+#!/usr/bin/env bash
+# ponytail: Multi-project universal agent bootstrap V2.0 supporting Two-Tier Kits and Contract-First Scaffolding
+set -euo pipefail
+
+ROLE="both"
+TARGET_DIR=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --role|-r)
+      ROLE="$2"
+      shift 2
+      ;;
+    --help|-h)
+      echo "Usage: agent-init-project [directory] [--role engineer|scientist|both]"
+      echo ""
+      echo "Options:"
+      echo "  --role, -r   Active role for the project: engineer, scientist, or both (default: both)"
+      echo "  --help, -h   Show this help message"
+      exit 0
+      ;;
+    *)
+      if [ -z "$TARGET_DIR" ]; then
+        TARGET_DIR="$1"
+      fi
+      shift
+      ;;
+  esac
+done
+
+TARGET_DIR="${TARGET_DIR:-$(pwd)}"
+mkdir -p "$TARGET_DIR"
+cd "$TARGET_DIR"
+
+echo "=== [Agent Toolkit Init V2.0] Setting up: $TARGET_DIR (Role: $ROLE) ==="
+
+mkdir -p .agents .agents/contracts
+
+# 1. Scaffolding Contracts based on role
+if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
+  if [ ! -f .agents/contracts/data_contract.template.json ]; then
+    cat <<'CONTRACT' > .agents/contracts/data_contract.template.json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "dataset_name": "sample_features",
+  "version": "1.0.0",
+  "primary_keys": ["entity_id", "timestamp"],
+  "temporal_column": "timestamp",
+  "columns": {
+    "entity_id": {"type": "string", "nullable": false},
+    "timestamp": {"type": "datetime", "nullable": false},
+    "metric_value": {"type": "float64", "nullable": false, "min": 0.0, "max": 10000.0}
+  }
+}
+CONTRACT
+  fi
+
+  if [ ! -f .agents/contracts/metrics_sla.template.json ]; then
+    cat <<'SLA' > .agents/contracts/metrics_sla.template.json
+{
+  "model_family": "sample_forecasting",
+  "baseline_champion_version": "1.0.0",
+  "global_metrics": {
+    "primary_metric": "wmape",
+    "target_threshold": 0.10,
+    "max_regression_tolerance": 0.02
+  },
+  "slice_constraints": {
+    "tier_1_cohorts": {"max_wmape": 0.08},
+    "tier_2_cohorts": {"max_wmape": 0.15}
+  }
+}
+SLA
+  fi
+  echo "[+] Scaffolded Scientist contracts in .agents/contracts/"
+fi
+
+if [[ "$ROLE" == "engineer" || "$ROLE" == "both" ]]; then
+  if [ ! -f .agents/contracts/api_contract.template.json ]; then
+    cat <<'API' > .agents/contracts/api_contract.template.json
+{
+  "api_version": "v1",
+  "endpoints": {
+    "/health": {"method": "GET", "expected_status": 200},
+    "/predict": {
+      "method": "POST",
+      "required_payload": ["entity_id", "timestamp"],
+      "expected_status": 200
+    }
+  }
+}
+API
+  fi
+  echo "[+] Scaffolded Engineer contracts in .agents/contracts/"
+fi
+
+# 2. Scaffolding project config.yaml
+cat <<CONFIG > .agents/config.yaml
+version: "2.0"
+project_role: "$ROLE"
+contracts:
+CONFIG
+
+if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
+  cat <<CONFIG >> .agents/config.yaml
+  data_contract: ".agents/contracts/data_contract.json"
+  metrics_sla: ".agents/contracts/metrics_sla.json"
+CONFIG
+fi
+
+if [[ "$ROLE" == "engineer" || "$ROLE" == "both" ]]; then
+  cat <<CONFIG >> .agents/config.yaml
+  api_contract: ".agents/contracts/api_contract.json"
+CONFIG
+fi
+
+cat <<CONFIG >> .agents/config.yaml
+runtime:
+  test_runner: "pytest"
+  linter: "ruff check"
+CONFIG
+echo "[+] Configured .agents/config.yaml"
+
+# 3. Create project kit.yaml for AgentKit
+cat <<KITYAML > .agents/kit.yaml
+project_role: "$ROLE"
+kits:
+KITYAML
+if [[ "$ROLE" == "engineer" || "$ROLE" == "both" ]]; then
+  echo "  - engineer" >> .agents/kit.yaml
+fi
+if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
+  echo "  - scientist" >> .agents/kit.yaml
+fi
+
+# 4. Build AGENTS.md
+cat <<RULES > .agents/AGENTS.md
+# Project Rules (Dual-Role Architecture V2.0)
+
+- **Active Skill**: Always trigger and respect the rules in [workspace-startup](file:///home/chinh303/.gemini/config/skills/workspace-startup/SKILL.md) skill.
+- **Active Role(s)**: $ROLE
+- **Project Contracts**: Configured in [.agents/config.yaml](file://$(pwd)/.agents/config.yaml).
+RULES
+
+if [[ "$ROLE" == "engineer" || "$ROLE" == "both" ]]; then
+  cat <<'RULES' >> .agents/AGENTS.md
+- **Engineer Kit (Two-Tier Hierarchy)**:
+  - **Macro-Phases**: `scout` (khảo sát call graph) -> `plan` (lập spec) -> `cook` (code Ponytail) -> `verify` (test suite) -> `review` (đánh giá đa chiều) -> `ship` (commit & Engram).
+  - **Atomic Action Skills**: `debug` (chứng minh root cause trước khi sửa), `fix` (bản vá tối thiểu cause-aligned).
+  - **Cognitive Framing**: Staff Archaeologist, Minimalist Engineer, QA Lead, Adversarial Tech Lead, Security Architect.
+RULES
+fi
+
+if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
+  cat <<'RULES' >> .agents/AGENTS.md
+- **Scientist Kit (Two-Tier Hierarchy)**:
+  - **Macro-Phases**: `data-audit` (audit schema & leakage) -> `pipeline-opt` (tối ưu DAG/Polars) -> `model-eval` (sliced metrics & LLM) -> `experiment-run` (manifest SHA-256) -> `promote-gate` (chốt 3 tầng).
+  - **Atomic Action Skills**: `data-audit` (quét look-ahead bias), `pipeline-opt` (vectorize thay vòng lặp), `model-eval` (chống Simpson's paradox).
+  - **Cognitive Framing**: Principal Data Auditor, Principal Platform Architect, Staff Quantitative Evaluator, Staff MLOps Architect.
+RULES
+fi
+
+cat <<'RULES' >> .agents/AGENTS.md
+- **Communication Style**: Adopt the ADHD response style (next action first, no filler, state restatement).
+- **Code implementation**: Use Ponytail mode (YAGNI, minimal footprint, `// ponytail:` or `# ponytail:` comment).
+- **Persistent Memory (Engram)**:
+  - Multi-project SSoT for decisions, facts, and learnings.
+  - Taxonomy: Working/Scratchpad (KHÔNG lưu) | Semantic (`fact/*`, `lesson/*`) | Episodic (`decision/*`, `task-state/*`) | Procedural (`workflow/*`) | User Preferences (`user-pref/*`, `scope: personal`).
+  - Lifecycle: `mem_context` khi start, `mem_session_summary` khi close/compaction.
+- **GitNexus**: Code intelligence. Bắt buộc impact analysis trước khi sửa symbol, detect_changes trước khi commit.
+- **Context Optimization**: Dùng `rtk` proxy cho các lệnh CLI output dài (`rtk git`, `rtk read`, `rtk psql`).
+- **Spec-Kit**: Dùng `specify init --here` và `specify plan`.
+RULES
+
+echo "[+] Configured .agents/AGENTS.md (Role: $ROLE)"
+
+if [ -d .git ]; then
+  if command -v gitnexus >/dev/null 2>&1; then
+    if [ ! -d .gitnexus ]; then
+      echo "[*] Analyzing repository with GitNexus..."
+      gitnexus analyze --index-only || echo "[!] GitNexus analyze skipped"
+    else
+      echo "[=] GitNexus index found"
+    fi
+  fi
+fi
+
+if command -v specify >/dev/null 2>&1; then
+  if [ ! -d .spec ]; then
+    echo "[*] Spec-Kit ready. Run 'specify init --here' when ready to draft specs."
+  else
+    echo "[=] Spec-Kit (.spec) found"
+  fi
+fi
+
+echo "=== [Done] Project ready with Role: $ROLE (V2.0)! ==="

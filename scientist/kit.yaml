@@ -1,0 +1,17 @@
+name: scientist
+version: 1.0.0
+description: "Universal Scientist Kit: 5-phase data pipeline, leakage audit, ML/LLM evaluation, and promotion workflows"
+exports:
+  skills:
+    - data-audit
+    - pipeline-opt
+    - model-eval
+    - experiment-run
+    - promote-gate
+  agents:
+    - pipeline-optimizer
+    - data-validator
+    - ml-evaluator
+    - experiment-tracker
+  hooks:
+    - hooks.json

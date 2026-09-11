@@ -1,0 +1,21 @@
+name: engineer
+version: 1.0.0
+description: "Universal Engineer Kit: 6-phase software engineering workflows with GitNexus, Engram, RTK, and Ponytail"
+exports:
+  skills:
+    - scout
+    - plan
+    - cook
+    - verify
+    - review
+    - ship
+    - debug
+    - fix
+  agents:
+    - code-explorer
+    - ponytail-dev
+    - test-engineer
+    - code-reviewer
+    - security-auditor
+  hooks:
+    - hooks.json

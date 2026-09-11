@@ -1,0 +1,28 @@
+{
+  "engineer-safety-hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "description": "Guard against destructive filesystem or git operations",
+        "guard_patterns": [
+          "rm -rf /",
+          "rm -rf ~",
+          "git push.*--force",
+          "DROP DATABASE"
+        ]
+      }
+    ],
+    "PreCommit": [
+      {
+        "description": "Run GitNexus detect-changes before committing",
+        "command": "gitnexus detect-changes --scope all --repo ."
+      }
+    ],
+    "SessionEnd": [
+      {
+        "description": "Mandatory Engram session summary check",
+        "action": "mem_session_summary"
+      }
+    ]
+  }
+}
