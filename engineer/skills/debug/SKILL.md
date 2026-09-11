@@ -26,4 +26,8 @@ The Debug workflow isolates failures systematically, establishing an unbroken ch
    - Root Cause Proof Report:
      - Exact line numbers and failing symbols.
      - Proven mechanism of failure with reproduction command.
-     - Hand-off recommendation to `fix` skill.
+      - Hand-off recommendation to `fix` skill.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Same contract as official `ak:debug` (prove cause before touching code); interchangeable.

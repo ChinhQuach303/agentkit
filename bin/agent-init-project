@@ -191,6 +191,7 @@ cat <<'RULES' >> .agents/AGENTS.md
 - **GitNexus [optional]**: Code intelligence. Run impact analysis before editing symbols and detect_changes before commit when available; otherwise use grep/AST fallback and note degraded mode.
 - **Context Optimization [optional]**: Dùng `rtk` proxy cho các lệnh CLI output dài (`rtk git`, `rtk read`, `rtk psql`) khi có; nếu không, dùng lệnh gốc.
 - **Spec-Kit [optional]**: Dùng `specify init --here` và `specify plan` khi có; nếu không, dùng plan markdown thủ công.
+- **Plan Artifacts**: Durable plans live in `plans/<YYYYMMDD-HHMM>-<slug>/plan.md` (files win over chat/task state). Session handoff in `.agents/HANDOFF.md` or Engram summary.
 RULES
 
 echo "[+] Configured .agents/AGENTS.md (Role: $ROLE)"

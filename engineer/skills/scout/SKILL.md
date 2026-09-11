@@ -24,5 +24,9 @@ The Scout workflow investigates the codebase, traces execution flows, and establ
    - A concise findings summary containing:
      - Target files & line ranges
      - Upstream callers & execution flows
-     - Blast radius assessment
-     - Handoff to `plan` phase
+      - Blast radius assessment
+      - Handoff to `plan` phase
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Need deeper evidence? Hand the findings to official `ak:scout` / `ak:research`; this skill is the Ponytail fast-path.

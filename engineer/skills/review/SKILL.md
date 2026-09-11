@@ -22,7 +22,12 @@ The Review workflow subjects implemented changes to an adversarial audit across 
 3. **Simplicity Audit**:
    - Check if standard library can replace any newly introduced custom logic.
 4. **Verdict**:
-   - Emit review verdict:
-     - **PASS**: Ready to ship.
-     - **CAUTION**: Non-blocking improvements noted.
-     - **BLOCK**: Must fix before ship.
+    - Emit review verdict:
+      - **PASS**: Ready to ship.
+      - **CAUTION**: Non-blocking improvements noted.
+      - **BLOCK**: Must fix before ship.
+- **Second-opinion checkpoint (advisory-only)**: on BLOCK or high-stakes calls, restate task + evidence + exact question for one fresh read (own session or peer agent). Counsel never approves, edits, or replaces this verdict.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Stronger chain when available: read-only `ak:security-scan` first, then `ak:code-review`; this skill is the single-pass alternative.

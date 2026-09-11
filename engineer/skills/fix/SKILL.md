@@ -20,7 +20,11 @@ The Fix workflow takes a proven root cause and applies the smallest surgical cor
    - Apply the targeted patch to the exact lines identified.
    - Maintain contiguous edits and preserve surrounding docstrings.
 3. **Immediate Local Verification**:
-   - Run the reproduction test case to confirm the bug is squashed.
-   - Run the full test suite to guarantee zero regression.
+    - Run the reproduction test case to confirm the bug is squashed.
+    - Run the relevant test suites to confirm no regression in covered behavior.
 4. **Deliverable**:
-   - Verified minimal diff and test output ready for `verify` or `review`.
+    - Verified minimal diff and test output ready for `verify` or `review`.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Same contract as official `ak:fix` (smallest cause-aligned repair); interchangeable.

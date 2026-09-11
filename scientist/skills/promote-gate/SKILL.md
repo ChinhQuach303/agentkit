@@ -33,4 +33,8 @@ The Promote Gate workflow enforces strict, automated verification gates before p
      - `topic_key`: "decision/ml-promotion-<model_id>"
      - `content`: What was promoted, why (metrics delta), where (storage path), learned (gotchas).
 6. **Deliverable**:
-   - Production Promotion Receipt containing gate checklist, storage URI, and Engram memory ID.
+    - Production Promotion Receipt containing gate checklist, storage URI, and Engram memory ID (or `HANDOFF.md` entry when Engram is unavailable).
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Custom kit, no official counterpart. Never bypass the 3-tier gates; a promotion without a receipt is a failed run.

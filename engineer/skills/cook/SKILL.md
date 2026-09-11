@@ -24,4 +24,8 @@ The Cook workflow executes the approved plan step-by-step with strict minimal co
 3. **Continuous Local Validation**:
    - Run linter/syntax checks (`ruff check`, `oxlint`, `tsc`) immediately after editing.
 4. **Handoff**:
-   - Once all planned changes are in place, immediately hand off to the `verify` phase.
+    - Once all planned changes are in place, immediately hand off to the `verify` phase.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Need modes, mandatory review, or `--advice` checkpoints? Hand the approved plan to official `ak:cook`; this skill is the Ponytail fast-path.

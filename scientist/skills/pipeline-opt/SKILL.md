@@ -26,4 +26,8 @@ The Pipeline Optimization workflow profiles and streamlines transformation DAGs,
    - Profile memory usage and prevent OOM spikes with lazy batching.
    - Mark intentional simplifications with `# ponytail: <reason>`.
 5. **Deliverable**:
-   - Pipeline Optimization Report showing before/after latency, RAM footprint, and throughput improvements.
+    - Pipeline Optimization Report showing before/after latency, RAM footprint, and throughput improvements.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Custom kit, no official counterpart. Requires a passing `data-audit` receipt before touching production pipelines.

@@ -3,8 +3,9 @@
     "PreToolUse": [
       {
         "matcher": "run_command",
-        "description": "Guard against destructive SQL on production/warehouse tables or data loss (enforced by guard.sh)",
+        "description": "Advisory screen for destructive SQL on production/warehouse tables or data loss (fail-open; blocks only where a runtime registers this PreToolUse denial)",
         "command": "scientist/hooks/guard.sh",
+        "enforcement": "advisory",
         "guard_patterns": [
           "DROP TABLE.*(prod|production)",
           "DROP DATABASE",
@@ -13,7 +14,9 @@
           "aws s3 rm.*--recursive.*prod"
         ]
       }
-    ],
+    ]
+  },
+  "checklists (not runtime events; owned by skill protocol)": {
     "PrePromotion": [
       {
         "description": "Verify bundle manifest and HMAC signature before production promotion",
@@ -25,8 +28,7 @@
     ],
     "SessionEnd": [
       {
-        "description": "Engram session summary check when available (optional)",
-        "action": "mem_session_summary",
+        "description": "promote-gate writes receipt / HANDOFF.md entry (mem_save when Engram is available)",
         "optional": true
       }
     ]

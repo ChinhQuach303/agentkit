@@ -25,4 +25,8 @@ The Model & LLM Evaluation workflow conducts rigorous, multi-dimensional assessm
 4. **Residual & Failure Analysis**:
    - Isolate worst-performing 5% cases to identify systematic model blindspots.
 5. **Deliverable**:
-   - Multi-slice Evaluation Scorecard with explicit Champion vs Candidate delta and Go / No-Go verdict.
+    - Multi-slice Evaluation Scorecard with explicit Champion vs Candidate delta and Go / No-Go verdict.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Custom kit, no official counterpart. A Go verdict here is the required input to `experiment-run` packaging.

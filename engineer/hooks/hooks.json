@@ -3,8 +3,9 @@
     "PreToolUse": [
       {
         "matcher": "run_command",
-        "description": "Guard against destructive filesystem or git operations (enforced by guard.sh; patterns are fallback)",
+        "description": "Advisory screen for destructive filesystem or git operations (fail-open; blocks only where a runtime registers this PreToolUse denial)",
         "command": "engineer/hooks/guard.sh",
+        "enforcement": "advisory",
         "guard_patterns": [
           "rm -rf /",
           "rm -rf ~",
@@ -12,19 +13,19 @@
           "DROP DATABASE"
         ]
       }
-    ],
+    ]
+  },
+  "checklists (not runtime events; owned by skill protocol)": {
     "PreCommit": [
       {
-        "description": "Run GitNexus detect-changes before committing when available (optional, degraded mode OK)",
-        "command": "gitnexus detect-changes --scope all --repo .",
+        "description": "verify phase runs blast-radius check before commit (gitnexus when available, else git diff)",
         "optional": true,
         "fallback": "git status --short && git diff --stat"
       }
     ],
     "SessionEnd": [
       {
-        "description": "Engram session summary check when available (optional)",
-        "action": "mem_session_summary",
+        "description": "ship phase writes HANDOFF.md or mem_session_summary when Engram is available",
         "optional": true
       }
     ]

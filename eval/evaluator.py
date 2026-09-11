@@ -19,6 +19,29 @@ _DEFAULT_KITS = os.environ.get(
 )
 KITS_DIR = _DEFAULT_KITS
 
+# ponytail: official Engineer skill base names (stable 2.14 catalog, without ak: prefix).
+# Bare-slug overlap is a NOTE (complement coexistence), never a failure.
+OFFICIAL_SKILLS = frozenset((
+    "help", "coding-level", "ask", "bro", "brainstorm", "advise", "sowat", "sumup",
+    "scout", "problem-solving", "predict", "sequential-thinking", "scenario", "plan",
+    "project-management", "plans-kanban", "issue-to-plan", "cook", "vibe", "loop",
+    "autoresearch", "deep-swe", "xia", "context-engineering", "folder-context",
+    "docs-seeker", "repomix", "research", "research-prompt", "tech-graph", "diagram",
+    "gkg", "graphify", "cti-expert", "project-organization", "watzup", "frontend-design",
+    "frontend-development", "backend-development", "databases", "web-frameworks", "devops",
+    "better-auth", "payment-integration", "shopify", "react-best-practices", "tanstack",
+    "mobile-development", "debug", "fix", "test", "web-testing", "code-review", "review-pr",
+    "security", "security-scan", "docs", "interview-docs", "document-skills", "copywriting",
+    "mermaidjs-v11", "markdown-novel-viewer", "mintlify", "preview", "show-off", "design",
+    "ui-styling", "ui-ux-pro-max", "web-design-guidelines", "threejs", "remotion",
+    "excalidraw", "stitch", "shader", "ai-artist", "ai-multimodal", "media-processing",
+    "html-video", "hyperframes", "fable-thinking", "agentkit", "use-mcp", "mcp-builder",
+    "skill-creator", "codex-goal", "goal-warmup", "agent-browser", "chrome-profile",
+    "google-adk-python", "llms", "git", "github", "deploy", "ship", "handoff", "handover",
+    "journal", "retro", "bootstrap", "agentize", "find-skills", "orchestrate", "team",
+    "worktree", "ak",
+))
+
 def print_header(title):
     print(f"\n{'='*60}\n  {title}\n{'='*60}")
 
@@ -74,6 +97,44 @@ def run_tier_1(kit_name=None):
             else:
                 print(f"[FAIL] Structure {kit}/{skill_name}: need Protocol + Hard Rule(s) + Deliverable")
                 failed += 1
+                continue
+            # 2c. skill-creator identifier conformance: short kebab-case slug == dirname,
+            #      description length bounds, no angle brackets (packaging rejects them)
+            fm_name = re.search(r"^name:\s*[\"']?([^\"'\s]+)[\"']?\s*$", fm, re.MULTILINE)
+            fm_desc = re.search(r"^description:\s*[\"']?(.*?)[\"']?\s*$", fm, re.MULTILINE)
+            slug = fm_name.group(1) if fm_name else ""
+            desc = fm_desc.group(1) if fm_desc else ""
+            ok_slug = (
+                bool(re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", slug))
+                and len(slug) <= 40
+                and slug == skill_name
+            )
+            ok_desc = 10 <= len(desc) <= 500 and "<" not in content[:fm_match.end()] and ">" not in (fm_name.group(0) + fm_desc.group(0) if fm_name and fm_desc else "")
+            if ok_slug and ok_desc:
+                print(f"[PASS] Identifier {kit}/{skill_name} (kebab-case, name==dir, desc {len(desc)} chars)")
+                passed += 1
+            else:
+                print(f"[FAIL] Identifier {kit}/{skill_name}: slug={slug!r} desc_len={len(desc)}")
+                failed += 1
+            # 2d. No placeholder scaffolding shipped (skill-creator: delete unused placeholders)
+            skill_dir = os.path.dirname(skill_file)
+            placeholders = []
+            for sub in ("scripts", "references", "assets", "agents"):
+                p = os.path.join(skill_dir, sub)
+                if os.path.isdir(p):
+                    entries = os.listdir(p)
+                    if not entries or all(re.search(r"placeholder|example|todo", e, re.I) for e in entries):
+                        placeholders.append(sub)
+            if placeholders:
+                print(f"[FAIL] Placeholders shipped {kit}/{skill_name}: {placeholders}")
+                failed += 1
+            else:
+                print(f"[PASS] No placeholders {kit}/{skill_name}")
+                passed += 1
+            # 2e. Official-name overlap is a NOTE (complement coexistence, triggers differ)
+            if skill_name in OFFICIAL_SKILLS:
+                print(f"  [NOTE] {kit}/{skill_name} shares a bare name with official ak:{skill_name} "
+                      f"(triggers differ: /{skill_name} vs /ak:{skill_name}; see README bridge)")
 
     # 3. Check JSON schema for agents and hooks
     for kit in kits:
@@ -101,7 +162,8 @@ def run_tier_1(kit_name=None):
                 print(f"[FAIL] Agent Schema {kit}/{agent_base}: {err}")
                 failed += 1
 
-    # 4. Hooks reference enforceable guard scripts (V2.1)
+    # 4. Hooks reference advisory guard scripts + honest doctrine (no security-boundary claims)
+    banned_claims = re.compile(r"enforced|enforce locally|security boundary|boundar", re.I)
     for kit in ["engineer", "scientist"]:
         if kit_name and kit != kit_name:
             continue
@@ -111,6 +173,23 @@ def run_tier_1(kit_name=None):
             passed += 1
         else:
             print(f"[FAIL] Guard script missing/not executable: {kit}/hooks/guard.sh")
+            failed += 1
+            continue
+        hook_text = ""
+        for rel in ("hooks/hooks.json", "hooks/guard.sh"):
+            p = os.path.join(KITS_DIR, kit, rel)
+            if os.path.isfile(p):
+                with open(p) as f:
+                    hook_text += "\n" + f.read()
+        low = hook_text.lower()
+        if banned_claims.search(hook_text):
+            print(f"[FAIL] Hook doctrine {kit}: claims enforcement/security-boundary (must be advisory, fail-open)")
+            failed += 1
+        elif "advisory" in low and "fail-open" in low:
+            print(f"[PASS] Hook doctrine {kit} (advisory, fail-open)")
+            passed += 1
+        else:
+            print(f"[FAIL] Hook doctrine {kit}: missing advisory/fail-open wording")
             failed += 1
 
     print(f"\nTier 1 Summary: {passed} PASSED, {failed} FAILED")
@@ -257,6 +336,13 @@ def run_tier_2(kit_name=None):
                 else:
                     print("  [PASS] AGENTS.md portable (no hardcoded home path)")
                     passed += 1
+                # scaffold must not create .agents/skills (Codex coexistence: shared parent, no overwrite)
+                if os.path.isdir(os.path.join(tmp, ".agents", "skills")):
+                    print("  [FAIL] scaffold created .agents/skills (collides with Codex skill dir)")
+                    failed += 1
+                else:
+                    print("  [PASS] scaffold avoids .agents/skills (Codex coexistence)")
+                    passed += 1
                 # invalid role must fail
                 r2 = subprocess.run([init_script, tmp, "--role", "bogus"],
                                     capture_output=True, text=True)
@@ -268,6 +354,67 @@ def run_tier_2(kit_name=None):
                     failed += 1
     except Exception as e:
         print(f"  [FAIL] scaffold e2e exception: {e}")
+        failed += 1
+
+    # Scenario 5: install lifecycle e2e on a throwaway HOME (no residue, backup works)
+    print("[RUN] Scenario 5: install.sh lifecycle e2e (install -> doctor -> uninstall)")
+    installer = os.path.join(KITS_DIR, "install.sh")
+    try:
+        with tempfile.TemporaryDirectory(prefix="ak-home-") as home:
+            env = dict(os.environ, HOME=home, AGENTKIT_SKIP_VERIFY="1")
+            gem_skills = os.path.join(home, ".gemini", "config", "skills")
+            os.makedirs(gem_skills)
+            # foreign content that install must back up, never overwrite
+            foreign_dir = os.path.join(gem_skills, "verify")
+            os.makedirs(foreign_dir)
+            with open(os.path.join(foreign_dir, "user-note.md"), "w") as f:
+                f.write("user content\n")
+            r = subprocess.run(["bash", installer, "--runtime", "gemini"],
+                               capture_output=True, text=True, env=env)
+            if r.returncode != 0:
+                print(f"  [FAIL] install failed: {r.stderr[-500:]}")
+                failed += 1
+            else:
+                link = os.path.join(gem_skills, "cook")
+                if os.path.islink(link) and os.path.realpath(link).startswith(KITS_DIR + os.sep):
+                    print("  [PASS] install linked skills to throwaway HOME")
+                    passed += 1
+                else:
+                    print("  [FAIL] install did not link skills correctly")
+                    failed += 1
+                bak = os.path.join(home, ".agentkit-backups")
+                kept = any(
+                    root.endswith("verify") and "user-note.md" in files
+                    for root, _, files in os.walk(bak)
+                )
+                if kept:
+                    print("  [PASS] foreign content backed up (not overwritten)")
+                    passed += 1
+                else:
+                    print("  [FAIL] foreign content lost (no backup)")
+                    failed += 1
+            r = subprocess.run(["bash", installer, "doctor", "--runtime", "gemini"],
+                               capture_output=True, text=True, env=env)
+            if r.returncode == 0:
+                print("  [PASS] doctor healthy after install")
+                passed += 1
+            else:
+                print(f"  [FAIL] doctor reported issues: {r.stdout[-500:]}")
+                failed += 1
+            r = subprocess.run(["bash", installer, "uninstall", "--runtime", "gemini"],
+                               capture_output=True, text=True, env=env)
+            leftovers = [
+                p for p in glob.glob(os.path.join(gem_skills, "*"))
+                if os.path.islink(p) and os.path.realpath(p).startswith(KITS_DIR + os.sep)
+            ]
+            if r.returncode == 0 and not leftovers:
+                print("  [PASS] uninstall removed only owned links (no residue)")
+                passed += 1
+            else:
+                print(f"  [FAIL] uninstall residue: {leftovers} rc={r.returncode}")
+                failed += 1
+    except Exception as e:
+        print(f"  [FAIL] lifecycle e2e exception: {e}")
         failed += 1
 
     print(f"\nTier 2 Summary: {passed} PASSED, {failed} FAILED")

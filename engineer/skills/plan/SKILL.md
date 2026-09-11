@@ -22,5 +22,15 @@ The Plan workflow transforms Scout findings and user requirements into an atomic
    - Highlight potential breaking changes, data migrations, or API contract updates.
    - Provide concrete time estimates per step.
 4. **Deliverable**:
-   - Write or update the implementation plan artifact.
-   - Request user feedback before unlocking the `cook` phase.
+    - Write or update the implementation plan artifact.
+    - Request user feedback before unlocking the `cook` phase.
+
+## Plan Artifacts (file-first)
+- Canonical path: `plans/<YYYYMMDD-HHMM>-<slug>/plan.md` (phase detail in `phase-NN-*.md` when >1 phase).
+- Plan files win over chat history or task views when states disagree; reindex by re-reading the folder.
+- Handoff contract every next stage must receive:
+  `Goal / Approved scope + non-goals / Evidence & decisions / Artifacts produced / Acceptance criteria / Open risks / Authority granted`.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Need phased `plan.md`, red-team, or `--tdd` gates? Hand the checklist to official `ak:plan`; this skill is the Ponytail fast-path.

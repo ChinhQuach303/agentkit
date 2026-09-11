@@ -28,4 +28,8 @@ The Experiment Run workflow manages reproducible experiment execution, hyperpara
    - Compute HMAC-SHA256 signature over canonical `manifest.json` content.
    - Save signature into sidecar `manifest.json.sig`.
 5. **Deliverable**:
-   - Packaged Model Bundle with verified `manifest.json` and HMAC signature ready for promote-gate.
+    - Packaged Model Bundle with verified `manifest.json` and HMAC signature ready for promote-gate.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Custom kit, no official counterpart. Bundle is promotion-ready only after `promote-gate` signs the receipt.

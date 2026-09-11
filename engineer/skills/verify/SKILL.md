@@ -9,7 +9,7 @@ The Verify workflow provides concrete proof of correctness and ensures no uninte
 
 ## Hard Rules
 - **EVIDENCE BEFORE ASSERTIONS**: Never claim code works without running verification commands.
-- **GRAPH INTEGRITY CHECK**: Bắt buộc chạy `gitnexus detect-changes` trước khi commit.
+- **GRAPH INTEGRITY CHECK**: Run `gitnexus detect-changes` before commit when available; otherwise `git status/diff` (degraded mode OK).
 
 ## Protocol
 1. **Automated Test Execution**:
@@ -22,4 +22,8 @@ The Verify workflow provides concrete proof of correctness and ensures no uninte
 3. **Fail-Closed Gate**:
    - If tests fail, drop into `debug` skill mode: reproduce -> isolate -> fix -> re-verify.
 4. **Handoff**:
-   - Once 100% tests pass and blast radius matches the plan, proceed to the `review` phase.
+    - Once 100% tests pass and blast radius matches the plan, proceed to the `review` phase.
+
+## Availability & Handoff
+- Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.
+- Prefer official `ak:test` for independent validation; this skill folds test + blast-radius into one pass.

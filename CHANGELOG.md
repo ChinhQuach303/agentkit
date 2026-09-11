@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased (toward v2.1.1)
+- Docs: honest custom-local positioning, official skill bridge tables, runtime support matrix, per-skill availability notes.
+- `install.sh`: `install|uninstall|doctor` actions, `--dry-run` preview, `--skills/--exclude-skills`, timestamped backup of foreign content (`~/.agentkit-backups/`), Codex target fixed to `~/.agents/skills`, `AGENTKIT_SKIP_VERIFY=1`.
+- Hooks doctrine: advisory + fail-open; `PreCommit`/`SessionEnd`/`PrePromotion` moved to skill-protocol checklists.
+- Skills: durable `plans/<ts>-<slug>/plan.md` artifacts, `HANDOFF.md` convention, second-opinion checkpoint in review.
+- `ak-eval`: skill-creator identifier checks, placeholder guard, official-name overlap NOTEs, hook-doctrine honesty gate, install lifecycle e2e, `.agents/skills` coexistence probe.
+
 ## v2.1.0 — Public usable
 Focus: blockers fixed, multi-runtime, optional deps, honest strict evaluator.
 
