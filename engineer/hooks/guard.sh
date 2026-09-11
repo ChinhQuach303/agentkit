@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2016 # ponytail: $/backtick in grep -E patterns below are intentional regex literals, not shell expansions.
 # ponytail: Engineer destructive-command guard (enforce, not just declarative).
 # Usage: guard.sh "<command>"  -> exit 0 allow, exit 1 block
 #        echo "<command>" | guard.sh
