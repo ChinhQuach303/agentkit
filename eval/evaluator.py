@@ -19,8 +19,19 @@ _DEFAULT_KITS = os.environ.get(
 )
 KITS_DIR = _DEFAULT_KITS
 
-# ponytail: official Engineer skill base names (stable 2.14 catalog, without ak: prefix).
+# ponytail: skills whose protocol shows commands/outputs must carry a Redact rule.
+REDACT_SKILLS = frozenset((
+    "debug", "verify", "review", "ship",
+    "pipeline-opt", "experiment-run", "promote-gate",
+))
+
+_CMD_SPAN = re.compile(
+    r"`[^`]*\b(git|pytest|ruff|oxlint|tsc|pl\.|dbt|curl|guard\.sh|python|pip|npx|uvx|psql|"
+    r"sha256sum|ls|mkdir|find|cat|mem_\w*|rtk|specify|polars|ak-eval|agent-init-project|"
+    r"handoff|grep|diff|gh|docker|kubectl)\b[^`]*`"
+)
 # Bare-slug overlap is a NOTE (complement coexistence), never a failure.
+# ponytail: official Engineer skill base names (stable 2.14 catalog, without ak: prefix).
 OFFICIAL_SKILLS = frozenset((
     "help", "coding-level", "ask", "bro", "brainstorm", "advise", "sowat", "sumup",
     "scout", "problem-solving", "predict", "sequential-thinking", "scenario", "plan",
@@ -135,6 +146,34 @@ def run_tier_1(kit_name=None):
             if skill_name in OFFICIAL_SKILLS:
                 print(f"  [NOTE] {kit}/{skill_name} shares a bare name with official ak:{skill_name} "
                       f"(triggers differ: /{skill_name} vs /ak:{skill_name}; see README bridge)")
+            # 2f. Writing-quality gates per docs/skill-standard.md
+            trig = bool(re.search(r"\buse when\b|\buse if\b|\bmentions?\b|\breach(es)? for\b", desc, re.I))
+            if trig:
+                print(f"[PASS] Triggers {kit}/{skill_name} (description lists branches)")
+                passed += 1
+            else:
+                print(f"[FAIL] Triggers {kit}/{skill_name}: description has no use-when branches")
+                failed += 1
+            if re.search(r"completion criter", body, re.I):
+                print(f"[PASS] Completion criteria {kit}/{skill_name}")
+                passed += 1
+            else:
+                print(f"[FAIL] Completion criteria {kit}/{skill_name}: no per-phase completion criterion")
+                failed += 1
+            if skill_name in REDACT_SKILLS:
+                if "REDACTED" in body or re.search(r"^#+ .*redact", body, re.M | re.I):
+                    print(f"[PASS] Redact rule {kit}/{skill_name}")
+                    passed += 1
+                else:
+                    print(f"[FAIL] Redact rule {kit}/{skill_name}: shows commands/outputs but no Redact rule")
+                    failed += 1
+            n_cmd = len(_CMD_SPAN.findall(body))
+            if n_cmd >= 3:
+                print(f"[PASS] Concrete commands {kit}/{skill_name} ({n_cmd} spans)")
+                passed += 1
+            else:
+                print(f"[FAIL] Concrete commands {kit}/{skill_name}: only {n_cmd} command spans (need >=3)")
+                failed += 1
 
     # 3. Check JSON schema for agents and hooks
     for kit in kits:
@@ -156,6 +195,15 @@ def run_tier_1(kit_name=None):
                 )
                 if not has_rubric:
                     raise AssertionError("missing self_challenge/adversarial rubric")
+                # schema v2: versioned delegation contract (inputs/outputs/budgets/delegation)
+                assert data.get("version"), "missing version"
+                assert isinstance(data.get("inputs"), list) and data["inputs"] and all(
+                    "name" in i for i in data["inputs"]
+                ), "inputs must be a non-empty list with names"
+                assert isinstance(data.get("outputs"), dict) and "format" in data["outputs"], "outputs.format missing"
+                assert isinstance(data.get("budgets"), dict) and "output_words" in data["budgets"], "budgets.output_words missing"
+                deleg = data.get("delegation", {})
+                assert deleg.get("called_by") and "authority" in deleg, "delegation.called_by/authority missing"
                 print(f"[PASS] Cognitive Agent Schema: {kit}/{agent_base}")
                 passed += 1
             except Exception as err:
@@ -191,6 +239,19 @@ def run_tier_1(kit_name=None):
         else:
             print(f"[FAIL] Hook doctrine {kit}: missing advisory/fail-open wording")
             failed += 1
+        # wiring snippets: valid JSON, PreToolUse entry pointing at guard.sh ($KIT_DIR placeholder)
+        for snip in ("claude-snippet.json", "gemini-snippet.json"):
+            p = os.path.join(KITS_DIR, kit, "hooks", snip)
+            try:
+                with open(p) as f:
+                    doc = json.load(f)
+                text = json.dumps(doc)
+                assert "PreToolUse" in text and "guard.sh" in text
+                print(f"[PASS] Wiring snippet {kit}/hooks/{snip}")
+                passed += 1
+            except Exception as err:
+                print(f"[FAIL] Wiring snippet {kit}/hooks/{snip}: {err}")
+                failed += 1
 
     print(f"\nTier 1 Summary: {passed} PASSED, {failed} FAILED")
     return failed == 0
@@ -343,6 +404,14 @@ def run_tier_2(kit_name=None):
                 else:
                     print("  [PASS] scaffold avoids .agents/skills (Codex coexistence)")
                     passed += 1
+                # rules scaffold: shared language + ADR template
+                for rp in ("CONTEXT.md", os.path.join("docs", "adr", "0001-template.md")):
+                    if os.path.isfile(os.path.join(tmp, rp)):
+                        print(f"  [PASS] scaffold rules artifact: {rp}")
+                        passed += 1
+                    else:
+                        print(f"  [FAIL] scaffold missing rules artifact: {rp}")
+                        failed += 1
                 # invalid role must fail
                 r2 = subprocess.run([init_script, tmp, "--role", "bogus"],
                                     capture_output=True, text=True)

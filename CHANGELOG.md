@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased (toward v2.2.0 — skill depth pass, after mattpocock/skills)
+- `docs/skill-standard.md` (new SSoT): trigger-pointer descriptions, per-phase completion criteria, concrete commands (≥3), anti-patterns with tells, ordered lookups, Redact rule, user checkpoints, disclosure bar, positive voice.
+- All 13 skills rewritten: trigger branches, completion criteria, concrete commands, Redact sections (7 output-showing skills), user checkpoints; refs added for `debug/loop-catalog.md`, `review/smells.md`, `verify/seam-guide.md`, `model-eval/slice-catalog.md`.
+- Agents schema v2 (9 files): `version`, `inputs[]`, `outputs.format`, `budgets.output_words`, `delegation{called_by, returns, authority}`.
+- Hooks wiring: `claude-snippet.json` + `gemini-snippet.json` per kit with `WIRING.md` (verify-signaling procedure, fail-open); Gemini hook schema probed on live machine.
+- Rules scaffold: `agent-init-project` writes `CONTEXT.md` (shared language) + `docs/adr/0001-template.md`, idempotent; `scout`/`review` reference CONTEXT.md.
+- `ak-eval`: writing-quality gates (triggers, completion criteria, redact, command count), agent schema v2 validation, snippet JSON checks, rules-artifact + lifecycle e2e.
+
 ## Unreleased (toward v2.1.1)
 - Docs: honest custom-local positioning, official skill bridge tables, runtime support matrix, per-skill availability notes.
 - `install.sh`: `install|uninstall|doctor` actions, `--dry-run` preview, `--skills/--exclude-skills`, timestamped backup of foreign content (`~/.agentkit-backups/`), Codex target fixed to `~/.agents/skills`, `AGENTKIT_SKIP_VERIFY=1`.

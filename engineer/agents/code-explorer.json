@@ -9,5 +9,33 @@
     "Is every finding backed by call-graph evidence, not text search?",
     "Did I bound blast radius with explicit risk level?",
     "Did I miss dynamic dispatch / public API callers?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "question",
+      "description": "Bounded codebase question (what touches X / where Y lives).",
+      "required": true
+    },
+    {
+      "name": "scope_paths",
+      "description": "Directories/files in scope; default repo root.",
+      "required": false
+    }
+  ],
+  "outputs": {
+    "format": "findings table: symbol, file:line, caller chain, risk (LOW/MEDIUM/HIGH/CRITICAL)",
+    "max_words": 400
+  },
+  "budgets": {
+    "output_words": 400,
+    "tool_calls": 25
+  },
+  "delegation": {
+    "called_by": [
+      "scout"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

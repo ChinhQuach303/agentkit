@@ -9,5 +9,33 @@
     "Can this be substantially simpler via stdlib?",
     "What prod edge cases (concurrency, OOM, exceptions) will fail?",
     "Does it adhere to Engram ADRs?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "diff_ref",
+      "description": "Fixed point for git diff <fixed-point>...HEAD.",
+      "required": true
+    },
+    {
+      "name": "spec_path",
+      "description": "Originating spec/issue path; may be absent.",
+      "required": false
+    }
+  ],
+  "outputs": {
+    "format": "## Standards and ## Spec reports, <=400 words each, verbatim findings",
+    "max_words": 800
+  },
+  "budgets": {
+    "output_words": 800,
+    "tool_calls": 25
+  },
+  "delegation": {
+    "called_by": [
+      "review"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

@@ -9,5 +9,43 @@
     "Are sliced metrics reported, not just aggregate?",
     "Does any SLA slice regress vs Champion?",
     "Is LLM judging temp=0 with schema-validated rubric?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "champion_ref",
+      "description": "Production baseline model/version.",
+      "required": true
+    },
+    {
+      "name": "candidate_ref",
+      "description": "Candidate model/version.",
+      "required": true
+    },
+    {
+      "name": "holdout",
+      "description": "Frozen holdout window, identical for both.",
+      "required": true
+    },
+    {
+      "name": "sla",
+      "description": "Per-slice regression tolerances.",
+      "required": false
+    }
+  ],
+  "outputs": {
+    "format": "slice table (metric, champion, candidate, delta, bound, verdict) + Go/No-Go",
+    "max_words": 600
+  },
+  "budgets": {
+    "output_words": 600,
+    "tool_calls": 25
+  },
+  "delegation": {
+    "called_by": [
+      "model-eval"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

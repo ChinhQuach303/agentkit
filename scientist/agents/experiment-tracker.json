@@ -9,5 +9,34 @@
     "Are commit/dataset/seed/hparams all locked?",
     "Do SHA-256 + HMAC verify for every file?",
     "Is serialization free of pickle code-exec risk?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "run_dir",
+      "description": "Training run directory / bundle path.",
+      "required": true
+    },
+    {
+      "name": "model_id",
+      "description": "Model identifier for manifest + receipt.",
+      "required": true
+    }
+  ],
+  "outputs": {
+    "format": "lineage block + manifest verification (hashes, signature) + receipt",
+    "max_words": 500
+  },
+  "budgets": {
+    "output_words": 500,
+    "tool_calls": 20
+  },
+  "delegation": {
+    "called_by": [
+      "experiment-run",
+      "promote-gate"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

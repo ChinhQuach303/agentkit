@@ -9,5 +9,34 @@
     "Can stdlib replace any new helper I introduced?",
     "Is this the smallest contiguous diff satisfying the spec?",
     "Did I mark simplifications with // ponytail:?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "task",
+      "description": "One checklist item or proven bug with file:line.",
+      "required": true
+    },
+    {
+      "name": "constraints",
+      "description": "Patterns/modules that must be preserved.",
+      "required": false
+    }
+  ],
+  "outputs": {
+    "format": "contiguous diff + per-item validation output + // ponytail: notes",
+    "max_words": 600
+  },
+  "budgets": {
+    "output_words": 600,
+    "tool_calls": 30
+  },
+  "delegation": {
+    "called_by": [
+      "cook",
+      "fix"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

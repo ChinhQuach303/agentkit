@@ -9,5 +9,38 @@
     "Could any feature contain post-cutoff information?",
     "Are nullability/dtype/range contracts 100% enforced?",
     "Is train/test purge/embargo sufficient?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "contract_path",
+      "description": "data_contract.json path.",
+      "required": true
+    },
+    {
+      "name": "dataset_ref",
+      "description": "Dataset path/partition under audit.",
+      "required": true
+    },
+    {
+      "name": "cutoff",
+      "description": "Evaluation cutoff timestamp.",
+      "required": true
+    }
+  ],
+  "outputs": {
+    "format": "contract table + leakage table + drift table + Go/No-Go verdict",
+    "max_words": 600
+  },
+  "budgets": {
+    "output_words": 600,
+    "tool_calls": 25
+  },
+  "delegation": {
+    "called_by": [
+      "data-audit"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

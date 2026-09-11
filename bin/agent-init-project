@@ -154,6 +154,35 @@ if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
   echo "  - scientist" >> .agents/kit.yaml
 fi
 
+# 4b. Project rules scaffold (shared language + ADR; idempotent, never overwrite)
+mkdir -p docs/adr
+if [ ! -f CONTEXT.md ]; then
+  cat <<'CTX' > CONTEXT.md
+# CONTEXT.md — project shared language (single source of truth for terms)
+
+One term per row. Agents and humans use these words verbatim in code, tests, and docs;
+consistent names make the codebase navigable and thinking cheaper.
+
+| Term | Means | Does NOT mean |
+|---|---|---|
+| _example: materialize_ | _give a lesson a spot in the filesystem_ | _publish / go live_ |
+
+Rules: define on first use in `scout`/`plan`; challenge collisions in `review`; never duplicate the meaning elsewhere.
+CTX
+  echo "[+] Scaffolded CONTEXT.md (shared language)"
+fi
+if [ ! -f docs/adr/0001-template.md ]; then
+  cat <<'ADR' > docs/adr/0001-template.md
+# ADR-0001: <decision> (template — copy to 0002, 0003, ...)
+
+- Status: proposed | accepted | superseded by ADR-00XX
+- Context: what forced this choice (facts, constraints).
+- Decision: what we chose, in one paragraph.
+- Consequences: what gets easier, what gets harder, cost of reversal.
+ADR
+  echo "[+] Scaffolded docs/adr/0001-template.md"
+fi
+
 # 4. Build AGENTS.md (portable: no absolute dev-machine paths)
 cat <<RULES > .agents/AGENTS.md
 # Project Rules (Dual-Role Architecture V2.1)
@@ -192,6 +221,7 @@ cat <<'RULES' >> .agents/AGENTS.md
 - **Context Optimization [optional]**: Dùng `rtk` proxy cho các lệnh CLI output dài (`rtk git`, `rtk read`, `rtk psql`) khi có; nếu không, dùng lệnh gốc.
 - **Spec-Kit [optional]**: Dùng `specify init --here` và `specify plan` khi có; nếu không, dùng plan markdown thủ công.
 - **Plan Artifacts**: Durable plans live in `plans/<YYYYMMDD-HHMM>-<slug>/plan.md` (files win over chat/task state). Session handoff in `.agents/HANDOFF.md` or Engram summary.
+- **Project Rules**: Shared language in `CONTEXT.md` (define terms on first use; agents must reuse them verbatim). Hard decisions recorded as ADRs in `docs/adr/`.
 RULES
 
 echo "[+] Configured .agents/AGENTS.md (Role: $ROLE)"

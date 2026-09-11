@@ -1,30 +1,33 @@
 ---
 name: cook
-description: "Phase 3: Implement approved work using Ponytail minimal footprint discipline."
+description: "Implement one approved plan phase with surgical minimal edits. Use when a plan or clear task is approved and the user wants code, not more discussion."
 ---
 
-# Cook Skill (Phase 3: Implementation)
+# Cook Skill (Implementation)
 
-The Cook workflow executes the approved plan step-by-step with strict minimal code discipline.
+Execute the plan order, nothing else. Unplanned scope discovered mid-flight goes back to `plan` — it never sneaks into the diff.
 
 ## Hard Rules
-- **Ponytail Mode**:
-  - YAGNI: If code is not strictly required by the plan, do not write it.
-  - Standard Library First: Prefer language built-in functions over new dependencies.
-  - Minimal Footprint: Keep edits contiguous and concise.
-  - Ponytail Comment: Mark deliberate simplifications with `// ponytail:` or `# ponytail:`.
-- **Atomic Execution**: Implement one item at a time; do not perform massive multi-file refactors in a single leap.
+- **PLAN-BOUND**: If code isn't in the approved phase, don't write it (YAGNI). New scope → stop, replan.
+- **STANDARD LIBRARY FIRST**: Prefer builtins over new deps; <20 lines of stdlib beats a dependency.
+- **ATOMIC EXECUTION**: One checklist item at a time; no multi-file refactor leaps without per-item verification.
+- **PONYTAIL NOTATION**: Mark deliberate simplifications `// ponytail: <reason>` / `# ponytail: <reason>`.
 
 ## Protocol
-1. **Pre-edit Impact Confirmation**:
-   - Ensure the symbol being edited was verified during the `scout` phase.
+1. **Pre-edit impact confirmation**:
+   - The symbol was scouted: re-check `impact` upstream if the tree moved since scouting; confirm the edit stays inside the blast radius `plan` approved.
+   - **Completion criterion:** impacted set still ⊆ approved set, or plan is updated first.
 2. **Implementation**:
-   - Edit files with surgical precision using replace tools or targeted writes.
-   - Preserve existing documentation and code styles.
-3. **Continuous Local Validation**:
-   - Run linter/syntax checks (`ruff check`, `oxlint`, `tsc`) immediately after editing.
+   - Contiguous surgical edits via replace tools; preserve docstrings, styles, and surrounding conventions.
+   - Anti-pattern: **drive-by refactoring** (touching adjacent code "while here"). Tell: hunks outside the phase's files. Fix: revert, file separately.
+   - **Completion criterion:** diff touches only phase files; every hunk traces to a checklist item.
+3. **Continuous local validation**:
+   - After each item: `ruff check <paths>` / `oxlint` / `tsc --noEmit` (whichever the repo uses) plus the item's done-means check.
+   - Fix failures now; don't accumulate red across items.
+   - **Completion criterion:** linters clean, each item's observable check passes.
 4. **Handoff**:
-    - Once all planned changes are in place, immediately hand off to the `verify` phase.
+   - Hand to `verify` with: changed files, per-item checks run, known risks left open.
+   - **Completion criterion:** `verify` needs no re-read of the plan to start.
 
 ## Availability & Handoff
 - Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.

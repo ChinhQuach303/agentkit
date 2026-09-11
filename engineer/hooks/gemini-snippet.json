@@ -1,0 +1,16 @@
+{
+  "agentkit-engineer-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$KIT_DIR/engineer/hooks/guard.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

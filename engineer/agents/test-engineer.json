@@ -9,5 +9,33 @@
     "Do tests fail without the fix (non-tautological)?",
     "Are null/empty/concurrency boundaries covered?",
     "Does detect-changes show zero unintended flows?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "seams",
+      "description": "Confirmed seam list under test.",
+      "required": true
+    },
+    {
+      "name": "commands",
+      "description": "Suite commands to run.",
+      "required": true
+    }
+  ],
+  "outputs": {
+    "format": "per-seam table: command, pass/fail counts, failing lines (redacted)",
+    "max_words": 400
+  },
+  "budgets": {
+    "output_words": 400,
+    "tool_calls": 20
+  },
+  "delegation": {
+    "called_by": [
+      "verify"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

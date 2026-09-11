@@ -1,32 +1,38 @@
 ---
 name: pipeline-opt
-description: "Phase 2: Optimize data pipelines, dbt incremental models, Dagster DAGs, and vectorized Polars operations."
+description: "Profile then vectorize a slow or memory-hungry pipeline step. Use when a DAG stage is slow, OOMs, or the user asks to speed up or slim down a transformation."
 ---
 
-# Pipeline Optimization Skill (Phase 2: Pipeline & DAG Optimization)
+# Pipeline Opt Skill (Profile, Then Vectorize)
 
-The Pipeline Optimization workflow profiles and streamlines transformation DAGs, maximizing throughput and minimizing memory footprint without unnecessary complexity.
+Optimize the measured bottleneck, not the guessed one. Every change carries before/after numbers or it didn't happen.
 
 ## Hard Rules
-- **PONYTAIL VECTORIZATION**: Never iterate over rows (`iterrows`, Python loops). Use native `polars` expressions (`select`, `with_columns`, `group_by`) or set-based SQL.
-- **LAZY BY DEFAULT**: In Polars, prefer `pl.scan_parquet()` / `pl.scan_csv()` over immediate in-memory eager reads.
-- **NO INTERMEDIATE BLOAT**: Materialize DataFrames only when feeding sinks or crossing process boundaries.
+- **PROFILE FIRST**: No rewrite without a baseline (plan output, timing, peak RAM). Guessed hotspots stay untouched.
+- **VECTORIZE, DON'T LOOP**: No row iteration (`iterrows`, Python loops) — native `polars` (`select`, `with_columns`, `group_by`) or set-based SQL.
+- **LAZY BY DEFAULT**: `pl.scan_parquet()` / `pl.scan_csv()` over eager reads; materialize only at sinks and process boundaries.
+- **REQUIRES A PASSING `data-audit` RECEIPT** before touching production pipelines.
+
+## Redact
+Query plans and profiles may embed table names, credentials, or customer identifiers. **Redact secrets** (`<REDACTED>`), show plan shapes and timings, not raw connection strings or row samples.
 
 ## Protocol
-1. **DAG & Query Profiling**:
-   - Inspect query execution plans with `EXPLAIN (ANALYZE, BUFFERS)` via `rtk psql`.
-   - Identify sequential scans, hash-join spills, or redundant CTE re-evaluations.
-2. **dbt & Incremental Efficiency**:
-   - Ensure `is_incremental()` macros include correct partition filtering and idempotent `unique_key` merging.
-   - Verify upstream dependency pruning (`--select +model_name+`).
-3. **Dagster Partitioning & IO Management**:
-   - Verify partitioned assets run with bounded chunk sizes.
-   - Guard against unbounded concurrent tasks exhausting worker RAM.
-4. **Memory Profiling & Streaming**:
-   - Profile memory usage and prevent OOM spikes with lazy batching.
-   - Mark intentional simplifications with `# ponytail: <reason>`.
-5. **Deliverable**:
-    - Pipeline Optimization Report showing before/after latency, RAM footprint, and throughput improvements.
+1. **DAG & query profiling**:
+   - Get the plan: `EXPLAIN (ANALYZE, BUFFERS)` via `rtk psql`; find sequential scans, hash-join spills, redundant CTE re-evaluations.
+   - Time the stage end-to-end and record peak RAM as the baseline pair.
+   - Anti-pattern: **premature vectorization** (rewriting unmeasured code). Tell: no baseline numbers exist. Fix: measure first.
+   - **Completion criterion:** baseline (plan + latency + peak RAM) recorded; bottleneck named.
+2. **dbt incremental efficiency**:
+   - `is_incremental()` macros carry partition filters; merges keyed on idempotent `unique_key`; verify pruning with `dbt build --select +model_name+`.
+   - **Completion criterion:** incremental run touches only fresh partitions, verified by run output.
+3. **Partitioning & IO bounds**:
+   - Partitioned assets run bounded chunk sizes; concurrent tasks capped so worker RAM can't exhaust.
+   - Anti-pattern: **unbounded fan-out** ("more workers = faster"). Tell: RAM climbs with parallelism. Fix: cap concurrency, stream in chunks.
+   - **Completion criterion:** chunk/concurrency bounds written in config, not tribal knowledge.
+4. **Deliverable**:
+   - Optimization report: before/after latency, RAM footprint, throughput — with the commands that produced each number.
+   - Mark intentional simplifications `# ponytail: <reason>`.
+   - **Completion criterion:** every claimed gain traces to a recorded run.
 
 ## Availability & Handoff
 - Verified on Gemini/Antigravity; elsewhere file presence ≠ active — confirm the running runtime reads this dir.

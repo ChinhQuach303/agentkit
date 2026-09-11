@@ -9,5 +9,28 @@
     "Did I trace untrusted input to every sink?",
     "Is there string-interpolated shell/SQL or hardcoded secret?",
     "Are validation/encoding/least-privilege all present?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "scope",
+      "description": "Diff or files touching untrusted inputs/sinks.",
+      "required": true
+    }
+  ],
+  "outputs": {
+    "format": "taint findings: source -> sink chain, severity, fix; raw interpolation = hard finding",
+    "max_words": 400
+  },
+  "budgets": {
+    "output_words": 400,
+    "tool_calls": 25
+  },
+  "delegation": {
+    "called_by": [
+      "review"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

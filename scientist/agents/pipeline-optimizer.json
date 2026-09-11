@@ -9,5 +9,33 @@
     "Is there any row loop replaceable by Polars/SQL vectorization?",
     "Are scans lazy with bounded partitions?",
     "Is the model idempotent with unique_key?"
-  ]
+  ],
+  "version": "2.1.0",
+  "inputs": [
+    {
+      "name": "stage",
+      "description": "Pipeline stage under optimization.",
+      "required": true
+    },
+    {
+      "name": "baseline",
+      "description": "Baseline latency + peak RAM + plan output.",
+      "required": true
+    }
+  ],
+  "outputs": {
+    "format": "before/after table (latency, RAM, throughput) with producing commands",
+    "max_words": 500
+  },
+  "budgets": {
+    "output_words": 500,
+    "tool_calls": 25
+  },
+  "delegation": {
+    "called_by": [
+      "pipeline-opt"
+    ],
+    "returns": "focused result to the calling skill; caller owns decisions, edits, and gates",
+    "authority": "advisory-only: no code edits outside the delegated patch scope, no approvals, no external actions"
+  }
 }

@@ -35,8 +35,10 @@ agentkit/
 │   │   ├── code-explorer.json, ponytail-dev.json, test-engineer.json,
 │   │   ├── code-reviewer.json, security-auditor.json
 │   └── hooks/                  # hooks.json (optional) + guard.sh (advisory)
-│       ├── hooks.json          # PreToolUse (advisory), PreCommit/SessionEnd checklists (see §3)
-│       └── guard.sh            # Destructive-command screen (advisory, fail-open; see §3)
+│       ├── hooks.json          # PreToolUse (advisory), checklists owned by skill protocol
+│       ├── guard.sh            # Destructive-command screen (advisory, fail-open; see §3)
+│       ├── claude-snippet.json / gemini-snippet.json  # runtime wiring (see hooks/WIRING.md)
+│       └── WIRING.md           # install + verify-signaling procedure per runtime
 │
 ├── scientist/                  # Role 2: Data Scientist / ML Engineer Kit
 │   ├── kit.yaml                # Manifest v2.1.0 (5 skills, 4 agents, hooks)
@@ -45,8 +47,9 @@ agentkit/
 │   │   ├── pipeline-optimizer.json, data-validator.json,
 │   │   ├── ml-evaluator.json, experiment-tracker.json
 │   ├── hooks/                  # hooks.json (optional) + guard.sh (advisory)
-│   │   ├── hooks.json          # PreToolUse screen (advisory), PrePromotion manifest check
-│   │   └── guard.sh            # Destructive-data screen (advisory, fail-open; see §3)
+│   │   ├── hooks.json          # PreToolUse screen (advisory), checklists owned by skill protocol
+│   │   ├── guard.sh            # Destructive-data screen (advisory, fail-open; see §3)
+│   │   └── claude/gemini-snippet.json  # runtime wiring (see engineer/hooks/WIRING.md)
 │   └── templates/              # manifest.template.json, data_contract.template.json
 │
 └── eval/                       # 3-Tier Native Python Evaluation Suite (stdlib only, zero-cost)
@@ -175,8 +178,8 @@ ak-eval --all --kits-dir ~/.local/share/agent-kits
 ./eval/evaluator.py --all --kits-dir .
 ```
 
-- **Tier 1 (Static Gate)**: `kit.yaml` versions, frontmatter, skill structure (Protocol+Hard Rules+Deliverable/Verdict/Handoff), agent `self_challenge` rubric, executable `guard.sh`.
-- **Tier 2 (Execution Gate)**: Executes real `guard.sh` (incl. bypass variants like `sudo rm -rf /`, `--force-with-lease`), temporal leakage check, HMAC-SHA256 tamper detection, plus `agent-init-project` scaffold e2e (contracts exist, no hardcoded home path, invalid role rejected).
+- **Tier 1 (Static Gate)**: `kit.yaml` versions, frontmatter, skill structure (Protocol+Hard Rules+Deliverable/Verdict/Handoff), writing quality per `docs/skill-standard.md` (trigger branches, completion criteria, Redact rule, ≥3 concrete commands, identifier shape, no placeholders), agent schema v2 (`self_challenge`, inputs/outputs/budgets/delegation), executable `guard.sh` + valid wiring snippets + advisory/fail-open doctrine.
+- **Tier 2 (Execution Gate)**: Executes real `guard.sh` (incl. bypass variants like `sudo rm -rf /`, `--force-with-lease`), temporal leakage check, HMAC-SHA256 tamper detection, plus `agent-init-project` scaffold e2e (contracts + `CONTEXT.md`/ADR template exist, no hardcoded home path, `.agents/skills` avoided, invalid role rejected) and `install.sh` lifecycle e2e on a throwaway HOME (install → doctor → uninstall, foreign content backed up).
 - **Tier 3 (Cognitive Grading Gate)**: Scores agents on Role Clarity / Refusals / Ponytail+Rubric. Target ≥90% (v2.1 ships at 100%, 135/135).
 
 ---
@@ -192,8 +195,8 @@ ak-eval --all --kits-dir ~/.local/share/agent-kits
 
 | Runtime | Status | Notes |
 |---|---|---|
-| Gemini / Antigravity (`~/.gemini/config/skills/`) | **Verified (primary)** | Trigger = skill dir name (`cook`, `data-audit`, …). Coexists with other skills. |
-| Claude Code (`~/.claude/skills/`) | Best-effort | Symlinked bare names (`/cook`), distinct from official `/ak:cook`. No plugin delivery. |
+| Gemini / Antigravity (`~/.gemini/config/skills/`) | **Verified (primary)** | Trigger = skill dir name (`cook`, `data-audit`, …). Coexists with other skills. Hook wiring snippet provided (`hooks/gemini-snippet.json`); verify block signaling per `hooks/WIRING.md` before relying on it. |
+| Claude Code (`~/.claude/skills/`) | Best-effort | Symlinked bare names (`/cook`), distinct from official `/ak:cook`. No plugin delivery. Hook snippet provided (`hooks/claude-snippet.json`). |
 | OpenCode (`~/.config/opencode/skills/`) | Best-effort | Same symlink layout; verify discovery per version. |
 | Codex (`~/.agents/skills/` user scope) | Supported | Same symlink layout; `doctor` verifies. Shares `.agents/` parent harmlessly with scaffolded project files (different paths). |
 | Cursor / Pi / OMP / Grok | Not supported | Docs-only. File presence ≠ active (adapter doctrine). |
