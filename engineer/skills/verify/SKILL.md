@@ -16,10 +16,10 @@ The Verify workflow provides concrete proof of correctness and ensures no uninte
    - Run relevant unit, integration, and regression test suites.
    - Use `rtk` to filter and compress test logs when running large suites.
 2. **Blast Radius Validation**:
-   - Run `node .gitnexus/run.cjs detect-changes --scope all --repo .` (or MCP `detect_changes`).
+   - Run GitNexus `detect_changes` (MCP) when available; fallback `gitnexus detect-changes --scope all --repo .` or `git status/diff` in degraded mode.
    - Verify that changes ONLY touched expected symbols and execution flows.
    - If unexpected symbols are flagged as affected, halt and investigate regression risk.
 3. **Fail-Closed Gate**:
-   - If tests fail, drop into `systematic-debugging` mode: reproduce -> isolate -> fix -> re-verify.
+   - If tests fail, drop into `debug` skill mode: reproduce -> isolate -> fix -> re-verify.
 4. **Handoff**:
    - Once 100% tests pass and blast radius matches the plan, proceed to the `review` phase.

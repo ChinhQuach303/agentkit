@@ -1,6 +1,6 @@
 name: engineer
-version: 1.0.0
-description: "Universal Engineer Kit: 6-phase software engineering workflows with GitNexus, Engram, RTK, and Ponytail"
+version: 2.1.0
+description: "Universal Engineer Kit V2.1: 6-phase software engineering workflows with GitNexus (optional), Ponytail"
 exports:
   skills:
     - scout

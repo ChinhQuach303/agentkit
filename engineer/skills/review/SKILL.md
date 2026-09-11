@@ -12,7 +12,7 @@ The Review workflow subjects implemented changes to an adversarial audit across 
   - Scrutinize all new abstractions, wrappers, and helper functions.
   - Cut out any speculative generality or dead code.
 - **SECURITY & TAINT CHECK**:
-  - Run GitNexus `explain` or taint analysis on data flows touching untrusted inputs or critical state.
+  - Run GitNexus `explain` (taint analysis) on data flows touching untrusted inputs or critical state when available; otherwise do manual input→sink trace and note degraded mode.
 
 ## Protocol
 1. **Correctness Review**:

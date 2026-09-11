@@ -1,0 +1,25 @@
+name: smoke
+on: [push, pull_request]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          shellcheck bin/agent-init-project install.sh engineer/hooks/guard.sh scientist/hooks/guard.sh
+      - name: python compile
+        run: python3 -m py_compile eval/evaluator.py
+      - name: ak-eval strict
+        run: python3 eval/evaluator.py --all --kits-dir .
+      - name: scaffold e2e
+        run: |
+          bash bin/agent-init-project /tmp/ak-demo --role both
+          test -f /tmp/ak-demo/.agents/config.yaml
+          test -f /tmp/ak-demo/.agents/contracts/data_contract.json
+          test -f /tmp/ak-demo/.agents/contracts/api_contract.json
+          ! grep -r "chinh303" /tmp/ak-demo/.agents/AGENTS.md

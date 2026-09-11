@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ponytail: Multi-project universal agent bootstrap V2.0 supporting Two-Tier Kits and Contract-First Scaffolding
+# ponytail: Multi-project universal agent bootstrap V2.1 supporting Two-Tier Kits and Contract-First Scaffolding
 set -euo pipefail
 
 ROLE="both"
@@ -8,6 +8,10 @@ TARGET_DIR=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --role|-r)
+      if [[ $# -lt 2 ]]; then
+        echo "[!] Missing value for $1. Expected engineer|scientist|both" >&2
+        exit 2
+      fi
       ROLE="$2"
       shift 2
       ;;
@@ -32,11 +36,25 @@ TARGET_DIR="${TARGET_DIR:-$(pwd)}"
 mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR"
 
-echo "=== [Agent Toolkit Init V2.0] Setting up: $TARGET_DIR (Role: $ROLE) ==="
+if [[ "$ROLE" != "engineer" && "$ROLE" != "scientist" && "$ROLE" != "both" ]]; then
+  echo "[!] Invalid --role '$ROLE'. Expected engineer|scientist|both" >&2
+  exit 2
+fi
+
+echo "=== [Agent Toolkit Init V2.1] Setting up: $TARGET_DIR (Role: $ROLE) ==="
 
 mkdir -p .agents .agents/contracts
 
 # 1. Scaffolding Contracts based on role
+# ponytail: templates are sources; live *.json files are what config.yaml points to.
+copy_template_to_live() {
+  local tmpl="$1"
+  local live="$2"
+  if [ ! -f "$live" ] && [ -f "$tmpl" ]; then
+    cp "$tmpl" "$live"
+  fi
+}
+
 if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
   if [ ! -f .agents/contracts/data_contract.template.json ]; then
     cat <<'CONTRACT' > .agents/contracts/data_contract.template.json
@@ -72,6 +90,8 @@ CONTRACT
 }
 SLA
   fi
+  copy_template_to_live .agents/contracts/data_contract.template.json .agents/contracts/data_contract.json
+  copy_template_to_live .agents/contracts/metrics_sla.template.json .agents/contracts/metrics_sla.json
   echo "[+] Scaffolded Scientist contracts in .agents/contracts/"
 fi
 
@@ -91,12 +111,13 @@ if [[ "$ROLE" == "engineer" || "$ROLE" == "both" ]]; then
 }
 API
   fi
+  copy_template_to_live .agents/contracts/api_contract.template.json .agents/contracts/api_contract.json
   echo "[+] Scaffolded Engineer contracts in .agents/contracts/"
 fi
 
 # 2. Scaffolding project config.yaml
 cat <<CONFIG > .agents/config.yaml
-version: "2.0"
+version: "2.1"
 project_role: "$ROLE"
 contracts:
 CONFIG
@@ -133,13 +154,13 @@ if [[ "$ROLE" == "scientist" || "$ROLE" == "both" ]]; then
   echo "  - scientist" >> .agents/kit.yaml
 fi
 
-# 4. Build AGENTS.md
+# 4. Build AGENTS.md (portable: no absolute dev-machine paths)
 cat <<RULES > .agents/AGENTS.md
-# Project Rules (Dual-Role Architecture V2.0)
+# Project Rules (Dual-Role Architecture V2.1)
 
-- **Active Skill**: Always trigger and respect the rules in [workspace-startup](file:///home/chinh303/.gemini/config/skills/workspace-startup/SKILL.md) skill.
+- **Active Skill**: Always trigger and respect the rules in the \`workspace-startup\` skill (linked under your runtime skills dir, e.g. \`~/.gemini/config/skills/workspace-startup/SKILL.md\` or equivalent for Claude/OpenCode/Codex).
 - **Active Role(s)**: $ROLE
-- **Project Contracts**: Configured in [.agents/config.yaml](file://$(pwd)/.agents/config.yaml).
+- **Project Contracts**: Configured in \`.agents/config.yaml\` (relative to project root).
 RULES
 
 if [[ "$ROLE" == "engineer" || "$ROLE" == "both" ]]; then
@@ -163,13 +184,13 @@ fi
 cat <<'RULES' >> .agents/AGENTS.md
 - **Communication Style**: Adopt the ADHD response style (next action first, no filler, state restatement).
 - **Code implementation**: Use Ponytail mode (YAGNI, minimal footprint, `// ponytail:` or `# ponytail:` comment).
-- **Persistent Memory (Engram)**:
-  - Multi-project SSoT for decisions, facts, and learnings.
+- **Persistent Memory (Engram) [optional]**:
+  - Multi-project SSoT for decisions, facts, and learnings. If Engram MCP is unavailable, skip with a warning (degraded mode).
   - Taxonomy: Working/Scratchpad (KHÔNG lưu) | Semantic (`fact/*`, `lesson/*`) | Episodic (`decision/*`, `task-state/*`) | Procedural (`workflow/*`) | User Preferences (`user-pref/*`, `scope: personal`).
-  - Lifecycle: `mem_context` khi start, `mem_session_summary` khi close/compaction.
-- **GitNexus**: Code intelligence. Bắt buộc impact analysis trước khi sửa symbol, detect_changes trước khi commit.
-- **Context Optimization**: Dùng `rtk` proxy cho các lệnh CLI output dài (`rtk git`, `rtk read`, `rtk psql`).
-- **Spec-Kit**: Dùng `specify init --here` và `specify plan`.
+  - Lifecycle: `mem_context` khi start, `mem_session_summary` khi close/compaction (skip if unavailable).
+- **GitNexus [optional]**: Code intelligence. Run impact analysis before editing symbols and detect_changes before commit when available; otherwise use grep/AST fallback and note degraded mode.
+- **Context Optimization [optional]**: Dùng `rtk` proxy cho các lệnh CLI output dài (`rtk git`, `rtk read`, `rtk psql`) khi có; nếu không, dùng lệnh gốc.
+- **Spec-Kit [optional]**: Dùng `specify init --here` và `specify plan` khi có; nếu không, dùng plan markdown thủ công.
 RULES
 
 echo "[+] Configured .agents/AGENTS.md (Role: $ROLE)"
@@ -178,10 +199,12 @@ if [ -d .git ]; then
   if command -v gitnexus >/dev/null 2>&1; then
     if [ ! -d .gitnexus ]; then
       echo "[*] Analyzing repository with GitNexus..."
-      gitnexus analyze --index-only || echo "[!] GitNexus analyze skipped"
+      gitnexus analyze --index-only || echo "[!] GitNexus analyze failed; continuing in degraded mode (fallback: grep/AST)"
     else
       echo "[=] GitNexus index found"
     fi
+  else
+    echo "[~] gitnexus not found; continuing in degraded mode (fallback: grep/AST)"
   fi
 fi
 
@@ -191,6 +214,8 @@ if command -v specify >/dev/null 2>&1; then
   else
     echo "[=] Spec-Kit (.spec) found"
   fi
+else
+  echo "[~] specify not found; skipping Spec-Kit (use manual plan markdown)"
 fi
 
-echo "=== [Done] Project ready with Role: $ROLE (V2.0)! ==="
+echo "=== [Done] Project ready with Role: $ROLE (V2.1)! ==="

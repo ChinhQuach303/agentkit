@@ -1,6 +1,6 @@
 name: scientist
-version: 1.0.0
-description: "Universal Scientist Kit: 5-phase data pipeline, leakage audit, ML/LLM evaluation, and promotion workflows"
+version: 2.1.0
+description: "Universal Scientist Kit V2.1: 5-phase data pipeline, leakage audit, ML/LLM evaluation, and promotion workflows (optional deps)"
 exports:
   skills:
     - data-audit

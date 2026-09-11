@@ -3,7 +3,8 @@
     "PreToolUse": [
       {
         "matcher": "run_command",
-        "description": "Guard against destructive SQL on production/warehouse tables or data loss",
+        "description": "Guard against destructive SQL on production/warehouse tables or data loss (enforced by guard.sh)",
+        "command": "scientist/hooks/guard.sh",
         "guard_patterns": [
           "DROP TABLE.*(prod|production)",
           "DROP DATABASE",
@@ -24,8 +25,9 @@
     ],
     "SessionEnd": [
       {
-        "description": "Mandatory Engram session summary check",
-        "action": "mem_session_summary"
+        "description": "Engram session summary check when available (optional)",
+        "action": "mem_session_summary",
+        "optional": true
       }
     ]
   }

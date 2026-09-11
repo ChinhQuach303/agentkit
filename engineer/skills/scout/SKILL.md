@@ -12,8 +12,8 @@ The Scout workflow investigates the codebase, traces execution flows, and establ
 
 ## Protocol
 1. **Locate Symbols & Execution Flows**:
-   - Use `gitnexus` to locate functions, classes, and execution traces.
-   - Run `node .gitnexus/run.cjs query "<concept>"` or MCP `query`.
+   - Use GitNexus MCP `query` when available; fallback to `gitnexus query "<concept>"` CLI or grep/AST in degraded mode.
+   - Run `node .gitnexus/run.cjs query "<concept>"` only for legacy local runner setups.
 2. **Impact & Blast Radius Analysis**:
    - For every symbol identified for modification, run `impact` analysis upstream.
    - Determine callers, affected execution flows, and risk level (LOW, MEDIUM, HIGH, CRITICAL).

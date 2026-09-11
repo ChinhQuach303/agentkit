@@ -3,7 +3,8 @@
     "PreToolUse": [
       {
         "matcher": "run_command",
-        "description": "Guard against destructive filesystem or git operations",
+        "description": "Guard against destructive filesystem or git operations (enforced by guard.sh; patterns are fallback)",
+        "command": "engineer/hooks/guard.sh",
         "guard_patterns": [
           "rm -rf /",
           "rm -rf ~",
@@ -14,14 +15,17 @@
     ],
     "PreCommit": [
       {
-        "description": "Run GitNexus detect-changes before committing",
-        "command": "gitnexus detect-changes --scope all --repo ."
+        "description": "Run GitNexus detect-changes before committing when available (optional, degraded mode OK)",
+        "command": "gitnexus detect-changes --scope all --repo .",
+        "optional": true,
+        "fallback": "git status --short && git diff --stat"
       }
     ],
     "SessionEnd": [
       {
-        "description": "Mandatory Engram session summary check",
-        "action": "mem_session_summary"
+        "description": "Engram session summary check when available (optional)",
+        "action": "mem_session_summary",
+        "optional": true
       }
     ]
   }
