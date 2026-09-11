@@ -7,6 +7,9 @@
 - Hooks wiring: `claude-snippet.json` + `gemini-snippet.json` per kit with `WIRING.md` (verify-signaling procedure, fail-open); Gemini hook schema probed on live machine.
 - Rules scaffold: `agent-init-project` writes `CONTEXT.md` (shared language) + `docs/adr/0001-template.md`, idempotent; `scout`/`review` reference CONTEXT.md.
 - `ak-eval`: writing-quality gates (triggers, completion criteria, redact, command count), agent schema v2 validation, snippet JSON checks, rules-artifact + lifecycle e2e.
+- New skills (engineer 11 total): `frame` (relentless 1-at-a-time interview → locked `brief.md`; `plan` consumes it), `deploy` (K8s gates: context, immutable tags, migrate+backup, rollout, undo), `scan` (read-only secrets/deps/patterns sweep feeding `review`); `REDACT_SKILLS` += deploy, scan.
+- Standard tweak: Ponytail constrains code, never plans (full artifacts stay); invocation axis (user-invoked `frame` vs model-invoked rest).
+- UI without a new skill: verification checklist in `cook`, screenshot requirement in `review`.
 
 ## Unreleased (toward v2.1.1)
 - Docs: honest custom-local positioning, official skill bridge tables, runtime support matrix, per-skill availability notes.

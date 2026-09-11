@@ -23,8 +23,9 @@ Execute the plan order, nothing else. Unplanned scope discovered mid-flight goes
    - **Completion criterion:** diff touches only phase files; every hunk traces to a checklist item.
 3. **Continuous local validation**:
    - After each item: `ruff check <paths>` / `oxlint` / `tsc --noEmit` (whichever the repo uses) plus the item's done-means check.
+   - UI touched? Verify on a real browser/device (not just code-read): breakpoints from the plan, keyboard focus order, label + contrast basics, no console errors. Screenshot the changed screens for `review`.
    - Fix failures now; don't accumulate red across items.
-   - **Completion criterion:** linters clean, each item's observable check passes.
+   - **Completion criterion:** linters clean, each item's observable check passes (+ UI screens verified when UI changed).
 4. **Handoff**:
    - Hand to `verify` with: changed files, per-item checks run, known risks left open.
    - **Completion criterion:** `verify` needs no re-read of the plan to start.

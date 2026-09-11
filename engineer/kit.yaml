@@ -3,12 +3,15 @@ version: 2.1.0
 description: "Universal Engineer Kit V2.1: 6-phase software engineering workflows with GitNexus (optional), Ponytail"
 exports:
   skills:
+    - frame
     - scout
     - plan
     - cook
     - verify
+    - scan
     - review
     - ship
+    - deploy
     - debug
     - fix
   agents:

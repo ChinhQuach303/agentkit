@@ -12,7 +12,7 @@ Plans are decisions with owners, not wishes. No implementation starts here — t
 - **EVIDENCE-GROUNDED**: Every step cites scout findings, docs, or code; no step floats on assumption.
 
 ## Protocol
-1. **Alignment checkpoint** (grill-lite — no separate skill needed):
+1. **Alignment checkpoint** (skip if `frame` already locked a `brief.md` — consume it, don't re-ask):
    - Restate: outcome, constraints, non-goals, acceptance criteria. Ask ONLY about material-missing decisions (ones that change scope or risk); never blanket-approve shopping.
    - Scan for overlap first: `ls plans/` and `git status --short` — unfinished plan files and dirty trees are blocking relationships until confirmed otherwise.
    - Kill ambiguity with one question per gap, then lock the answers into the artifact.

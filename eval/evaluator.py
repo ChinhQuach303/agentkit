@@ -21,7 +21,7 @@ KITS_DIR = _DEFAULT_KITS
 
 # ponytail: skills whose protocol shows commands/outputs must carry a Redact rule.
 REDACT_SKILLS = frozenset((
-    "debug", "verify", "review", "ship",
+    "debug", "verify", "review", "ship", "deploy", "scan",
     "pipeline-opt", "experiment-run", "promote-gate",
 ))
 

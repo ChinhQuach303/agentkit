@@ -34,6 +34,8 @@ Review output quotes diffs and specs. **Redact every secret first** (`<REDACTED>
    - Standards brief: "Per file/hunk: (a) documented-standard breaches with file+rule cites; (b) baseline smells by name with quoted hunk. Documented breaches may be hard; smells are always judgement calls. Skip tooling-enforced items. Under 400 words."
    - Spec brief: "(a) spec requirements missing/partial; (b) unasked behaviour (scope creep); (c) implemented-but-wrong. Quote the spec line per finding. Under 400 words."
    - Taint pass (fold into Standards): trace untrusted inputs to sinks with GitNexus `explain` when available (`gitnexus explain --target <file>`), else manual input→sink trace; raw interpolation into shell/SQL is a hard finding.
+   - Consume a `scan` report first when one exists (triage its BLOCK-worthy items before the axes); without one, note security coverage as a gap rather than assuming clean.
+   - UI in the diff? Require the screenshots from `cook`; check them against the spec (layout, states, error paths) instead of re-reading JSX.
    - **Completion criterion:** two bounded reports exist, each quotable to diff/spec lines.
 5. **Verdict**:
     - Present `## Standards` and `## Spec` verbatim or lightly cleaned — do not merge findings.

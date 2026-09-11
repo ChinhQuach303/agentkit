@@ -27,9 +27,9 @@ agentkit/
 ├── install.sh                  # One-command idempotent installer (--runtime gemini|claude|opencode|codex|all)
 │
 ├── engineer/                   # Role 1: Software Engineer Kit (Full-Stack, Backend, DevOps)
-│   ├── kit.yaml                # Manifest v2.1.0 (8 skills, 5 agents, hooks)
+│   ├── kit.yaml                # Manifest v2.1.0 (11 skills, 5 agents, hooks)
 │   ├── skills/
-│   │   ├── scout, plan, cook, verify, review, ship   # Tier 1: Macro-Phases
+│   │   ├── frame (user-invoked interview) -> scout, plan, cook, verify, scan, review, ship, deploy  # chain
 │   │   └── debug, fix                                # Tier 2: Atomic Action Skills
 │   ├── agents/                 # Staff-Level Framing + self_challenge rubrics (3 questions each)
 │   │   ├── code-explorer.json, ponytail-dev.json, test-engineer.json,
@@ -143,12 +143,15 @@ Ours are Ponytail fast-paths. When the official Engineer Kit is also installed, 
 
 | Ours | Official | Handoff rule |
 |---|---|---|
+| `frame` | `ak:brainstorm` (+ `ak:advise`) | Ours locks a brief via relentless 1-at-a-time interview; official for deeper direction comparison or pressure-testing. |
 | `scout` | `ak:scout` / `ak:research` | Ours for a quick blast-radius map; official when you need deep evidence or cited research. |
 | `plan` | `ak:plan` | Ours for an atomic ≤5-item checklist; official for phased `plan.md` artifacts, red-team, `--tdd`/`--yagni` gates. |
 | `cook` | `ak:cook` | Ours implements the approved plan minimally; official adds modes, mandatory review, `--advice` checkpoints. |
 | `verify` | `ak:test` | Prefer `ak:test` for independent validation; ours folds test + blast-radius in one pass. |
+| `scan` | `ak:security-scan` | Ours is the lean sweep (secrets, deps, patterns) feeding `review`; official goes deeper. |
 | `review` | `ak:security-scan` → `ak:code-review` | Run the read-only scan first, then review; ours is the single-pass alternative. |
 | `ship` | `ak:git` → `ak:ship` | Use guarded git workflows, then official release gates; ours bundles commit + memory. |
+| `deploy` | `ak:deploy` | Ours gates K8s releases (context, tags, migrate+backup, rollout, undo); official adds provider authority + URL verify. |
 | `debug` / `fix` | `ak:debug` / `ak:fix` | Same contract (prove cause → minimal repair); interchangeable. |
 | `ship` (memory) | `ak:handoff` / `ak:journal` | No Engram? Write `HANDOFF.md` (Goal/Decisions/Evidence/Blockers) so any session can resume. |
 

@@ -1,7 +1,17 @@
-# Skill Standard (single source of truth for all 13 skills)
+# Skill Standard (single source of truth for all skills)
 
 Distilled from `mattpocock/skills` levers (`writing-for-agents`, `code-review`, `tdd`, `diagnosing-bugs`).
 Every skill rewrite is reviewed against this file. Changing a rule = editing here first.
+
+> Scope rule: **Ponytail constrains code, never plans.** `cook`/`fix` stay minimal;
+> `frame`/`plan`/artifacts stay full and explicit. A "lean" skill below means lean
+> prose, not thin decisions.
+
+## 0. Invocation axis
+
+- **User-invoked** (`frame`): orchestrates, interviews, owns the session flow. Triggered by the user naming the outcome.
+- **Model-invoked** (rest): reusable discipline the agent reaches for when the task fits, or the chain calls explicitly.
+- A user-invoked skill may call model-invoked ones, never the reverse direction for flow control.
 
 ## 1. Description is a trigger pointer, not a phase label
 
@@ -31,7 +41,7 @@ Every skill rewrite is reviewed against this file. Changing a rule = editing her
 
 ## 6. Redact secrets (REDACT_SET)
 
-- Skills that show commands/outputs — `debug, verify, review, ship, pipeline-opt, experiment-run, promote-gate` — carry a Redact rule: `<REDACTED>` placeholders, env vars for credentials, quote only signal lines.
+- Skills that show commands/outputs — `debug, verify, review, ship, deploy, scan, pipeline-opt, experiment-run, promote-gate` — carry a Redact rule: `<REDACTED>` placeholders, env vars for credentials, quote only signal lines.
 - If redacted output is insufficient, the skill says so and asks the user. No silent proceeding.
 
 ## 7. User checkpoints, not just gates
@@ -52,4 +62,4 @@ Every skill rewrite is reviewed against this file. Changing a rule = editing her
 ## 10. Tier budgets
 
 - Deep (debug, review, verify, plan, data-audit, model-eval): 80–140 lines + at most 1 ref.
-- Lean (scout, cook, ship, fix, pipeline-opt, experiment-run, promote-gate): 50–70 lines, inline only.
+- Lean (scout, cook, ship, fix, frame, deploy, scan, pipeline-opt, experiment-run, promote-gate): 50–70 lines, inline only.
