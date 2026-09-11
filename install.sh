@@ -211,7 +211,12 @@ do_uninstall() {
   for bin in agent-init-project ak-eval; do
     local dest="${BIN_DIR}/${bin}"
     if is_ours "$dest"; then
-      [[ "$DRY_RUN" == "1" ]] && echo "[dry-run] remove $dest" || { rm "$dest"; echo "[-] removed $dest"; }
+      if [[ "$DRY_RUN" == "1" ]]; then
+        echo "[dry-run] remove $dest"
+      else
+        rm "$dest"
+        echo "[-] removed $dest"
+      fi
       removed=1
     else
       echo "[~] kept (not ours): $dest"
@@ -221,9 +226,16 @@ do_uninstall() {
     [[ -d "$dir" ]] || continue
     for skill_dir in "${SCRIPT_DIR}"/engineer/skills/* "${SCRIPT_DIR}"/scientist/skills/*; do
       [[ -d "$skill_dir" ]] || continue
-      local dest="${dir}/$(basename "$skill_dir")"
+      local skill_name
+      skill_name=$(basename "$skill_dir")
+      local dest="${dir}/${skill_name}"
       if is_ours "$dest"; then
-        [[ "$DRY_RUN" == "1" ]] && echo "[dry-run] remove $dest" || { rm "$dest"; echo "[-] removed ($name) $dest"; }
+        if [[ "$DRY_RUN" == "1" ]]; then
+          echo "[dry-run] remove $dest"
+        else
+          rm "$dest"
+          echo "[-] removed ($name) $dest"
+        fi
         removed=1
       fi
     done
@@ -264,7 +276,12 @@ do_doctor() {
       skill_name=$(basename "$skill_dir")
       local dest="${dir}/${skill_name}"
       if is_ours "$dest"; then
-        [[ -e "$dest" ]] && echo "[OK] ($name) $skill_name" || { echo "[BROKEN] ($name) dangling: $dest"; issues=1; }
+        if [[ -e "$dest" ]]; then
+          echo "[OK] ($name) $skill_name"
+        else
+          echo "[BROKEN] ($name) dangling: $dest"
+          issues=1
+        fi
       elif is_ours_dangling "$dest"; then
         echo "[BROKEN] ($name) ours but dangling (source moved?): $dest"; issues=1
       elif [[ -L "$dest" ]]; then
