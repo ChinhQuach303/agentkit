@@ -33,8 +33,8 @@
     "max_words": 600
   },
   "budgets": {
-    "output_words": 600,
-    "tool_calls": 25
+    "output_words": 2000,
+    "tool_calls": 100
   },
   "delegation": {
     "called_by": [
