@@ -2,9 +2,9 @@
 
 [![Custom Local Kits](https://img.shields.io/badge/AgentKit-Custom%20local%20kits%20v2.1-blue.svg)](https://docs.agentkit.best)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Test Suite](https://img.shields.io/badge/ak--eval-passing-brightgreen.svg)]()
+[![Test Suite](https://img.shields.io/badge/ak--eval-passing-brightgreen.svg)](https://github.com/ChinhQuach303/agentkit/actions/workflows/smoke.yml)
 
-A domain-agnostic, multi-project AI agent toolkit inspired by [AgentKit](https://docs.agentkit.best). Built natively for modern AI coding assistants (Antigravity `agy`, Claude Code, OpenCode, Codex).
+A domain-agnostic, multi-project AI agent toolkit inspired by [AgentKit](https://docs.agentkit.best). Built for Gemini CLI, Antigravity `agy`, Claude Code, OpenCode, and Codex.
 
 > **Positioning (honest):** these are **custom local kits**, not registry Standard kits. They install via the bundled
 > `install.sh` (symlinks, no `ak` dependency) and are designed to **complement the official Engineer Kit (stable 2.14)** —
@@ -227,11 +227,11 @@ Grader fixtures test only the checker. Real agent runs are manual and their resu
 
 | Runtime | Status | Notes |
 |---|---|---|
-| Gemini CLI (`~/.gemini/skills/`) | **Smoke-tested (primary)** | Installer targets Gemini CLI discovery and retains the Antigravity location. Trigger = skill dir name. Safe inventory check: `gemini skills list --all`. Hook signaling still needs runtime-specific verification. |
-| Antigravity (`~/.gemini/config/skills/`) | Best-effort | Installer links this legacy/runtime-specific location too. No safe non-interactive inventory check is available; verify discovery in a live session. |
-| Claude Code (`~/.claude/skills/`) | Best-effort | Symlinked bare names (`/cook`), distinct from official `/ak:cook`. No plugin delivery. Hook snippet provided (`hooks/claude-snippet.json`). |
-| OpenCode (`~/.config/opencode/skills/`) | Best-effort | Same symlink layout; verify discovery per version. |
-| Codex (`~/.agents/skills/` user scope) | Supported | Same symlink layout; `doctor` verifies. Shares `.agents/` parent harmlessly with scaffolded project files (different paths). |
+| Gemini CLI (`~/.gemini/skills/`) | **Discovery-smoke-tested (primary)** | Isolated `gemini skills list --all` finds the installed skill. Hook signaling still needs runtime-specific verification. |
+| Antigravity (`~/.gemini/config/skills/`) | Best-effort | Installer links this runtime-specific location too. No safe non-interactive inventory check is available; verify discovery in a live session. |
+| Claude Code (`~/.claude/skills/`) | **Unverified** | Isolated path and `claude doctor` pass, but the CLI has no safe non-interactive skill inventory; verify with `/skills` in a session. Hook snippet: `hooks/claude-snippet.json`. |
+| OpenCode (`~/.config/opencode/skills/`) | **Discovery-smoke-tested** | Isolated `opencode debug skill` finds the skill; runtime behavior can vary by version. |
+| Codex (`~/.agents/skills/` user scope) | **Discovery-smoke-tested** | `codex debug prompt-input` includes the linked skill content. Shares `.agents/` parent harmlessly with scaffolded project files (different paths). |
 | Cursor / Pi / OMP / Grok | Not supported | Docs-only. File presence ≠ active (adapter doctrine). |
 
 Troubleshooting (adapted from official): if a runtime cannot find a skill, check (1) target dir the *running* runtime actually reads,
