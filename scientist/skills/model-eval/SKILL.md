@@ -8,6 +8,7 @@ description: "Score a Candidate against the production Champion per slice, catch
 Aggregates lie: a global win routinely hides a cohort collapse. Every verdict here is per-slice; one regressed SLA-critical slice vetoes promotion.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **SLICED METRICS MANDATORY**: Never certify on a global number alone. Slices from `slice-catalog.md` matched to the domain.
 - **NO SILENT REGRESSIONS**: Any SLA-critical slice worse than Champion beyond tolerance = No-Go, regardless of globals.
 - **DETERMINISTIC JUDGING**: LLM-as-judge at temperature=0, multi-point rubric (faithfulness, schema validity, safety, tone), schema-validated JSON outputs.

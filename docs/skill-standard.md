@@ -63,3 +63,25 @@ Every skill rewrite is reviewed against this file. Changing a rule = editing her
 
 - Deep (debug, review, verify, plan, data-audit, model-eval): 80–140 lines + at most 1 ref.
 - Lean (scout, cook, ship, fix, frame, deploy, scan, pipeline-opt, experiment-run, promote-gate): 50–70 lines, inline only.
+
+## 11. Anti-Sycophancy & Scientific Neutrality (Epistemic Honesty)
+
+- **Cold Evidence First**: Verdicts must derive strictly from immutable metrics, confidence bounds, and slice deltas.
+- **Zero Flattery / Sugarcoating**: REFUSE to flatter, praise marginal gains, or soften No-Go decisions to please user expectations or prompts.
+- **Veto Over Agreeableness**: When data leaks or SLA-critical slices regress, issue a hard NO-GO / VETO without hesitation.
+
+## 12. Output & Context Discipline (Token Preservation)
+
+- **Bounded Tool Outputs**: Tabular data must be truncated (`head(3)`, `shape`), progress bars silenced (`tqdm(disable=True)`), and CLI outputs capped.
+- **In-Session Distillation**: After each milestone/phase, distill state into `HANDOFF.md` or persistent memory, pruning working context to prevent context bloat.
+
+## 13. Stage Approval Checkpoints
+
+- Every skill reports the completed stage and its evidence, then waits for explicit user approval before the next numbered protocol stage or skill handoff.
+- Starting a skill approves only its first stage; each approval authorizes only the named next stage. At the final stage, stop before any follow-on skill or action until approved.
+
+## 14. Outcome Evidence and Skill Changes
+
+- Grader fixtures prove checker behavior, not agent quality; report real runtime runs separately and mark missing runs `NOT RUN`.
+- Base skill changes on scrubbed usage cases, propose a focused diff, wait for approval, then rerun the affected deterministic cases.
+- Never collect or store raw session transcripts automatically. See [`docs/skill-lifecycle.md`](skill-lifecycle.md).

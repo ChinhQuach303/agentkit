@@ -8,6 +8,7 @@ description: "Apply the smallest repair for a proven root cause, then lock it wi
 One cause, one patch. Anything else in the diff is scope creep wearing a fix costume.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **CAUSE-ALIGNED ONLY**: Touch only lines responsible for the proven bug. No bundled refactoring, formatting, or features.
 - **PONYTAIL MINIMAL FOOTPRINT**: Builtins/stdlib before new helpers; contiguous edits; `// ponytail:` / `# ponytail:` on the why.
 - **NO PROOF, NO FIX**: Unproven cause → back to `debug`. A fix without a repro command is a guess.

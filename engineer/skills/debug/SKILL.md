@@ -8,6 +8,7 @@ description: "Prove the root cause of a failure with a tight red-capable feedbac
 A discipline for hard bugs. Skip phases only when explicitly justified. The loop is the skill: with a tight pass/fail signal for *this* bug you will find the cause; without one, no amount of staring at code saves you.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **ZERO CODE EDITS**: Never edit implementation code while in debug mode. Probes and throwaway harnesses live outside the tree or die in cleanup.
 - **LOOP BEFORE HYPOTHESIS**: Jumping straight to a theory before a red-capable command exists is the exact failure this skill prevents.
 - **MINIMISE BEFORE FIX**: A minimal repro shrinks the hypothesis space and becomes the regression test.

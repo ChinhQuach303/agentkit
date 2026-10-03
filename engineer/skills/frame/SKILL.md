@@ -8,6 +8,7 @@ description: "Lock fuzzy requirements into a confirmed brief through relentless 
 Misalignment is the most common failure mode: nobody knows exactly what they want until forced to say it. This skill forces it — **before** `plan` spends anything.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **ONE QUESTION AT A TIME**: Never batch questions. One gap, one question, one locked answer, then next.
 - **NO SOLUTIONEERING**: Tech choices before the problem is locked are banned. Problem first, always.
 - **NO BLANKET APPROVALS**: "Cứ làm đi" never covers a scope-changing decision. Split gaps, ask separately.

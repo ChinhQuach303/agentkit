@@ -8,6 +8,7 @@ description: "Catch leaking features, broken schemas, and drifted distributions 
 No model outruns its data: a leaking feature beats every architecture choice silently. Audit first, train never on a No-Go.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **ZERO TARGET / TEMPORAL LEAKAGE**: Fail immediately on future information (look-ahead bias) or target proxies. A leaky feature is deleted, never "handled downstream".
 - **CONTRACT BEFORE STATISTICS**: Schema compliance first; distributions only on contract-clean data.
 

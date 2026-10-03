@@ -13,7 +13,11 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
           shellcheck bin/agent-init-project install.sh engineer/hooks/guard.sh scientist/hooks/guard.sh
       - name: python compile
-        run: python3 -m py_compile eval/evaluator.py
+        run: python3 -m py_compile eval/*.py
+      - name: docs consistency
+        run: python3 eval/docs_consistency.py
+      - name: evaluator unit tests
+        run: python3 -m unittest discover -s eval -p 'test_*.py'
       - name: ak-eval strict
         run: python3 eval/evaluator.py --all --kits-dir .
       - name: scaffold e2e

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "engineer-review-idor",
+      "kit": "engineer",
+      "skill": "review",
+      "title": "Block an invoice ownership bypass",
+      "prompt": "Review this change as a read-only review. Requirement: users may view only invoices they own. In src/invoices.ts at line 42, the handler loads an invoice by request.invoiceId and returns it without checking invoice.ownerId against the authenticated user. Report the finding and verdict; do not fix the code.",
+      "assertions": [
+        {"id": "location", "kind": "contains", "value": "src/invoices.ts:42"},
+        {"id": "missing-authorization", "kind": "contains", "value": "owner authorization missing"},
+        {"id": "blocking-verdict", "kind": "contains", "value": "BLOCK"}
+      ],
+      "forbidden": [
+        {"id": "claims-review-pass", "kind": "contains_regex", "value": "(?i)review passed"}
+      ]
+    },
+    {
+      "id": "engineer-verify-red-tests",
+      "kit": "engineer",
+      "skill": "verify",
+      "title": "Report failed focused tests without claiming success",
+      "prompt": "Verification command `pytest -q tests/test_auth.py` ran and returned `2 failed, 8 passed`. Report the evidence and whether the change is verified. Do not rerun or edit anything.",
+      "assertions": [
+        {"id": "command-recorded", "kind": "contains", "value": "pytest -q tests/test_auth.py"},
+        {"id": "failure-count", "kind": "contains", "value": "2 failed"},
+        {"id": "not-verified", "kind": "contains_regex", "value": "(?i)not verified|verification failed"}
+      ],
+      "forbidden": [
+        {"id": "claims-all-green", "kind": "contains_regex", "value": "(?i)all tests passed"}
+      ]
+    },
+    {
+      "id": "scientist-audit-temporal-leakage",
+      "kit": "scientist",
+      "skill": "data-audit",
+      "title": "Reject a post-cutoff feature",
+      "prompt": "Audit the contract: prediction cutoff is 2026-04-10T10:00:00Z. Feature `customer_age_rollup` was materialized at 2026-04-10T10:15:00Z and is included in training rows. Report the leakage evidence and verdict; do not modify data.",
+      "assertions": [
+        {"id": "feature-named", "kind": "contains", "value": "customer_age_rollup"},
+        {"id": "post-cutoff-evidence", "kind": "contains_regex", "value": "(?i)after (the )?cutoff|post-cutoff"},
+        {"id": "fail-verdict", "kind": "contains_regex", "value": "(?i)\\bFAIL\\b|\\bNO-GO\\b"}
+      ],
+      "forbidden": [
+        {"id": "claims-clean", "kind": "contains_regex", "value": "(?i)no leakage found"}
+      ]
+    },
+    {
+      "id": "scientist-promotion-missing-signature",
+      "kit": "scientist",
+      "skill": "promote-gate",
+      "title": "Veto promotion when artifact signature is absent",
+      "prompt": "The candidate model passed data and performance gates, but its manifest has no signature and integrity verification cannot run. Return the promotion decision and identify the missing evidence. Do not sign or promote anything.",
+      "assertions": [
+        {"id": "no-go", "kind": "contains_regex", "value": "(?i)NO-GO|VETO"},
+        {"id": "missing-signature", "kind": "contains_regex", "value": "(?i)signature (is )?missing|missing signature"},
+        {"id": "promotion-blocked", "kind": "contains_regex", "value": "(?i)promotion (is )?blocked|do not promote"}
+      ],
+      "forbidden": [
+        {"id": "claims-go", "kind": "contains_regex", "value": "(?i)(?<!NO-)GO for promotion|approved for production"}
+      ]
+    }
+  ]
+}

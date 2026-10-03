@@ -1,0 +1,23 @@
+# AgentKit Upstream-Informed Assessment
+
+## Goal
+Assess what this custom AgentKit repository should learn from the public AgentKit product/docs, without assuming access to proprietary source code or changing kit behavior.
+
+## Tasks
+- [x] Inventory public upstream evidence (site, docs, public repos) and record what each source actually establishes → Verify: every conclusion links to a public source; marketing claims are labeled as claims. **Done:** inspected AgentKit site and public `bestagentkits/agentkit-docs` (dev branch), including delivery workflow, `cook`, `plan`, `skill-creator`, kit validation, skill verification, runtime discovery, and evaluation evidence docs. No public Engineer source tree found.
+- [x] Map this repository’s architecture and stated guarantees (kits, skills, runtimes, installer, evaluator) → Verify: each area has a corresponding path and current behavior noted. **Done:** reviewed README, manifests, skill standard, installer, evaluator, and pending diff.
+- [x] Compare both sides on customization, project-specific contracts, runtime support, validation, and release/docs maintenance → Verify: findings are categorized as adopt, adapt, or not applicable, with evidence. **Done:** the comparison and recommendations are summarized in the session response.
+- [x] Prioritize actionable gaps without changing files → Verify: each recommendation has impact, scope, and a concrete acceptance check; preserve existing uncommitted changes. **Done:** recommendations prioritized below; no project source files changed.
+- [x] Review the assessment for unsupported assumptions and present the prioritized recommendations → Verify: no claim about private implementation is stated as fact; final output distinguishes verified facts from inference. **Done:** claims are limited to public docs and inspected local files.
+
+## Findings and Priority
+
+1. **Adopt stage-sized workflows and explicit authority gates.** Public software-delivery docs recommend the smallest workflow matching uncertainty/risk, with implementation, independent test, review, and delivery as distinct stages. The local kit already has phase skills; strengthen their handoff contract and make commit/push/deploy authority explicit. **Acceptance:** a sample task can stop after planning or implementation without silently continuing to delivery.
+2. **Adapt runtime support claims to observable evidence.** Public docs explicitly state runtime-specific projection limits and that file presence does not prove discovery. Local README already labels support levels, but evaluator checks snippet structure, not that runtime loaded/executed it. **Acceptance:** each “verified” runtime has a repeatable discovery smoke test; other runtimes remain labeled best-effort.
+3. **Adopt layered evaluation, not only static prompt grading.** Upstream docs distinguish structural validation from execution and quality evidence; they warn that invocation success is not quality. Local evaluator passes static checks, scenario scripts, and a self-authored agent scorecard (139 + 28 + 135 checks), but Tier 3 is not an independent LLM/task outcome evaluation. **Acceptance:** document that limitation, then add a small frozen task corpus with artifact-based assertions before claiming agent effectiveness.
+4. **Adapt the skill-authoring lifecycle.** Public `skill-creator` docs describe audit → proposed optimize → explicit apply → validation → consumer evaluation. Local `docs/skill-standard.md` gives strong writing rules, but no equivalent usage/audit/evaluation loop is apparent. **Acceptance:** collect representative real uses and failures, then add an opt-in audit/eval path; avoid rewriting skills based only on style heuristics.
+5. **Adopt source-of-truth and drift checks for maintained docs/artifacts.** Public docs repo documents deterministic generation, CI drift checks, and reviewed release promotion. This is most relevant if this repository grows generated references or published releases. **Acceptance:** only add generation/release machinery where there is a real generated artifact; otherwise maintain concise manually reviewed docs.
+6. **Adapt the OCR integration conservatively.** This is a local pending change, not something established by upstream evidence. The installer reports OCR as optional, while the review protocol consumes its report in Standards. Keep missing/failing OCR non-blocking and ensure output is independently triaged and redacted. **Acceptance:** review still completes without OCR and cannot convert OCR output directly into a verdict.
+
+## Done When
+- [x] The user has an evidence-backed, prioritized assessment and can choose which recommendations to implement.

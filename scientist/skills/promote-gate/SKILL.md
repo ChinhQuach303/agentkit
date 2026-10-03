@@ -8,6 +8,7 @@ description: "Run the 3-tier promotion gates (data, performance, integrity) and 
 The Promote Gate workflow enforces strict, automated verification gates before promoting any candidate model to production, syncing artifacts and recording decisions into Engram.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **ZERO BYPASS ON 3-TIER GATES**:
   1. **Tier 1 - Data Gate**: 0 leakage flags and 100% schema contract compliance verified.
   2. **Tier 2 - Performance Gate**: Candidate meets or exceeds Champion on key metrics with zero unacceptable slice regressions.

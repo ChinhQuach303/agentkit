@@ -8,6 +8,7 @@ description: "Release a shipped change to a K8s/cloud target behind gates, with 
 Deploy is a gate sequence, not a command. Every gate has a completion criterion; a failed gate stops the chain — never `--force` past red.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **TARGET FIRST**: `kubectl config current-context` must name the intended cluster. Prod deploys on an assumed context are banned.
 - **IMMUTABLE TAGS**: Never deploy `:latest` to prod. Tag by commit SHA (`git rev-parse --short HEAD`).
 - **ROLLBACK BEFORE ROLLOUT**: The undo command is written and verified possible before anything is applied.

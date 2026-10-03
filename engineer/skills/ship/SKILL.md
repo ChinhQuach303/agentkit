@@ -8,6 +8,7 @@ description: "Commit a reviewed change cleanly and preserve session memory for t
 Delivery is a gate, not a reflex: clean tree, honest message, memory saved. Never commit to skip a gate.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **CLEAN REPO ONLY**: No commit with untracked secrets, stray artifacts, or red builds. `git status --short` must be explainable line by line.
 - **NO COMMIT WITHOUT APPROVAL**: The user approves the diff first; `--auto` never implies push/PR/merge authority.
 - **MEMORY BEFORE EXIT**: A session that learned nothing on record wasted the learning.

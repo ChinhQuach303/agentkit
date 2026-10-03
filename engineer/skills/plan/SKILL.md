@@ -8,6 +8,7 @@ description: "Turn an accepted direction plus scout evidence into an atomic chec
 Plans are decisions with owners, not wishes. No implementation starts here — the output is an artifact another session or skill can execute verbatim.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **HUMAN APPROVAL GATE**: Never start implementing until the user has reviewed and approved the plan.
 - **EVIDENCE-GROUNDED**: Every step cites scout findings, docs, or code; no step floats on assumption.
 

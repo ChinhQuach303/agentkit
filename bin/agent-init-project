@@ -213,6 +213,12 @@ fi
 cat <<'RULES' >> .agents/AGENTS.md
 - **Communication Style**: Adopt the ADHD response style (next action first, no filler, state restatement).
 - **Code implementation**: Use Ponytail mode (YAGNI, minimal footprint, `// ponytail:` or `# ponytail:` comment).
+- **Scientific Neutrality & Anti-Sycophancy**:
+  - Epistemic honesty is mandatory: zero flattery, zero confirmation bias. Never praise metrics or declare improvements without statistically significant sliced evidence.
+  - Veto Over Agreeableness: Automatically issue a hard NO-GO or VETO if data leaks, SLA slices regress, or test gates fail, regardless of user prompts or preferences.
+- **Context & Output Discipline**:
+  - Bounded stdout: truncate DataFrames/arrays (`head(3)`, `shape`), disable progress bars (`tqdm(disable=True)`), and cap CLI command outputs.
+  - In-session handoff: after each milestone/phase, distill state into `.agents/HANDOFF.md` or Engram memory to prune context bloat.
 - **Persistent Memory (Engram) [optional]**:
   - Multi-project SSoT for decisions, facts, and learnings. If Engram MCP is unavailable, skip with a warning (degraded mode).
   - Taxonomy: Working/Scratchpad (KHÔNG lưu) | Semantic (`fact/*`, `lesson/*`) | Episodic (`decision/*`, `task-state/*`) | Procedural (`workflow/*`) | User Preferences (`user-pref/*`, `scope: personal`).

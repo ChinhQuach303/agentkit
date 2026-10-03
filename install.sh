@@ -55,7 +55,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-GEMINI_DIR="${HOME}/.gemini/config/skills"
+GEMINI_DIR="${HOME}/.gemini/skills"
+ANTIGRAVITY_DIR="${HOME}/.gemini/config/skills"
 CLAUDE_DIR="${HOME}/.claude/skills"
 OPENCODE_DIR="${HOME}/.config/opencode/skills"
 CODEX_DIR="${HOME}/.agents/skills"
@@ -89,9 +90,17 @@ wanted_skill() {
   return 0
 }
 
+runtime_available() {
+  case "$1" in
+    gemini) command -v gemini >/dev/null 2>&1 || command -v agy >/dev/null 2>&1 ;;
+    claude|opencode|codex) command -v "$1" >/dev/null 2>&1 ;;
+    *) return 1 ;;
+  esac
+}
+
 runtime_dirs() {
   # echo "name dir" lines honoring filter
-  for pair in "gemini:${GEMINI_DIR}" "claude:${CLAUDE_DIR}" "opencode:${OPENCODE_DIR}" "codex:${CODEX_DIR}"; do
+  for pair in "gemini:${GEMINI_DIR}" "gemini:${ANTIGRAVITY_DIR}" "claude:${CLAUDE_DIR}" "opencode:${OPENCODE_DIR}" "codex:${CODEX_DIR}"; do
     local name="${pair%%:*}"
     local dir="${pair#*:}"
     if [[ "$RUNTIME_FILTER" == "all" || "$RUNTIME_FILTER" == "$name" ]]; then
@@ -137,7 +146,7 @@ do_install() {
   # 2. Skills per runtime
   while read -r name dir; do
     if [[ ! -d "$dir" ]]; then
-      if [[ "$RUNTIME_FILTER" == "$name" ]]; then
+      if [[ "$RUNTIME_FILTER" == "$name" ]] || runtime_available "$name"; then
         [[ "$DRY_RUN" == "1" ]] || mkdir -p "$dir"
         echo "[+] created runtime dir: $dir"
       else
@@ -182,6 +191,13 @@ do_install() {
     echo "[!] Notice: ${BIN_DIR} is not in your current PATH."
     echo "    Add it to your shell rc (e.g. ~/.bashrc or ~/.zshrc):"
     echo "    export PATH=\"\${HOME}/.local/bin:\$PATH\""
+  fi
+
+  # 3b. Availability only; review invokes OCR only after explicit provider/data/cost consent.
+  if command -v ocr >/dev/null 2>&1; then
+    echo "[OK] optional ocr available (version only): $(ocr --version 2>/dev/null | head -1 || echo present)"
+  else
+    echo "[~] optional ocr not found (review remains manual + gitnexus; install: npm install -g @alibaba-group/open-code-review)"
   fi
 
   # 4. Verification (skipped in dry-run or AGENTKIT_SKIP_VERIFY=1, e.g. nested eval e2e)
@@ -293,6 +309,12 @@ do_doctor() {
       fi
     done
   done < <(runtime_dirs)
+  # Optional tooling (info only, never affects exit code): availability check only; no OCR request is run.
+  if command -v ocr >/dev/null 2>&1; then
+    echo "[OK] optional ocr available (version only): $(ocr --version 2>/dev/null | head -1 || echo present)"
+  else
+    echo "[~] optional ocr not installed (review remains available without it)"
+  fi
   if [[ "$issues" == "0" ]]; then
     if [[ "$missing" == "0" ]]; then
       echo "[OK] All checked links healthy."

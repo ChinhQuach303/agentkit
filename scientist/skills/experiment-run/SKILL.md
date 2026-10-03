@@ -8,6 +8,7 @@ description: "Package one training run into a signed, reproducible bundle. Use w
 A run that can't be reproduced didn't happen. Lineage first, then bytes, then signature — in that order, no skipping.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **ABSOLUTE REPRODUCIBILITY**: Commit SHA (`git rev-parse HEAD`), dataset hash, random seeds, full hyperparameters, dependency versions. Missing one = incomplete run.
 - **NO PICKLE LINEAGE GAPS**: Standard formats only (ONNX, LightGBM binary, Safetensors) — never untrusted pickles.
 - **CANONICAL-THEN-SIGN**: Signature covers the exact canonical bytes that ship; sign last, verify after.

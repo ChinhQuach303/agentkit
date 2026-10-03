@@ -8,6 +8,7 @@ description: "Read-only security sweep for secrets, vulnerable deps, and dangero
 Find, don't fix. This skill reports findings with file:line + severity; `review` judges them, `fix` repairs them. A clean report names the tools that ran — "secure" without tool evidence is not a verdict.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **READ-ONLY**: Never edit code, never auto-fix, never commit. Findings only.
 - **NO SILENT SKIPS**: Every check is pass, flagged, or explicitly "not checked (tool missing)". Absence of a tool is a gap, not a pass.
 - **FIX OWNERSHIP ELSEWHERE**: Repairs belong to `fix`; risk calls belong to `review`.

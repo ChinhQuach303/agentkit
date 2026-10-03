@@ -19,6 +19,20 @@ _DEFAULT_KITS = os.environ.get(
 )
 KITS_DIR = _DEFAULT_KITS
 
+
+def ocr_review_doctrine_issues(content):
+    required = {
+        "standards-only evidence": "OCR IS EVIDENCE, NOT VERDICT",
+        "per-review consent": "explicit per-review approval",
+        "bounded spend": "positive token budget",
+        "secret exclusion": "never send secrets",
+        "no automatic config writes": "Never run `ocr config`",
+        "stdout-only report": "--output -",
+        "non-blocking fallback": "never a review failure",
+    }
+    return [label for label, phrase in required.items() if phrase.lower() not in content.lower()]
+
+
 # ponytail: skills whose protocol shows commands/outputs must carry a Redact rule.
 REDACT_SKILLS = frozenset((
     "debug", "verify", "review", "ship", "deploy", "scan",
@@ -109,6 +123,20 @@ def run_tier_1(kit_name=None):
                 print(f"[FAIL] Structure {kit}/{skill_name}: need Protocol + Hard Rule(s) + Deliverable")
                 failed += 1
                 continue
+            if re.search(r"STAGE CHECKPOINT.*explicit approval.*next stage or skill handoff", body, re.I):
+                print(f"[PASS] Stage approval checkpoint {kit}/{skill_name}")
+                passed += 1
+            else:
+                print(f"[FAIL] Stage approval checkpoint {kit}/{skill_name}: missing explicit per-stage approval rule")
+                failed += 1
+            if skill_name == "review":
+                ocr_issues = ocr_review_doctrine_issues(body)
+                if ocr_issues:
+                    print(f"[FAIL] OCR doctrine {kit}/{skill_name}: missing {', '.join(ocr_issues)}")
+                    failed += 1
+                else:
+                    print(f"[PASS] OCR consent doctrine {kit}/{skill_name}")
+                    passed += 1
             # 2c. skill-creator identifier conformance: short kebab-case slug == dirname,
             #      description length bounds, no angle brackets (packaging rejects them)
             fm_name = re.search(r"^name:\s*[\"']?([^\"'\s]+)[\"']?\s*$", fm, re.MULTILINE)
@@ -446,10 +474,17 @@ def run_tier_2(kit_name=None):
             else:
                 link = os.path.join(gem_skills, "cook")
                 if os.path.islink(link) and os.path.realpath(link).startswith(KITS_DIR + os.sep):
-                    print("  [PASS] install linked skills to throwaway HOME")
+                    print("  [PASS] install linked Gemini CLI skills to throwaway HOME")
                     passed += 1
                 else:
-                    print("  [FAIL] install did not link skills correctly")
+                    print("  [FAIL] install did not link Gemini CLI skills correctly")
+                    failed += 1
+                antigravity_link = os.path.join(home, ".gemini", "config", "skills", "cook")
+                if os.path.islink(antigravity_link) and os.path.realpath(antigravity_link).startswith(KITS_DIR + os.sep):
+                    print("  [PASS] install linked Antigravity skills to throwaway HOME")
+                    passed += 1
+                else:
+                    print("  [FAIL] install did not link Antigravity skills correctly")
                     failed += 1
                 bak = os.path.join(home, ".agentkit-backups")
                 kept = any(
@@ -472,8 +507,9 @@ def run_tier_2(kit_name=None):
                 failed += 1
             r = subprocess.run(["bash", installer, "uninstall", "--runtime", "gemini"],
                                capture_output=True, text=True, env=env)
+            antigravity_skills = os.path.join(home, ".gemini", "config", "skills")
             leftovers = [
-                p for p in glob.glob(os.path.join(gem_skills, "*"))
+                p for root in (gem_skills, antigravity_skills) for p in glob.glob(os.path.join(root, "*"))
                 if os.path.islink(p) and os.path.realpath(p).startswith(KITS_DIR + os.sep)
             ]
             if r.returncode == 0 and not leftovers:

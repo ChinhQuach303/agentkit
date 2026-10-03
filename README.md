@@ -11,7 +11,7 @@ A domain-agnostic, multi-project AI agent toolkit inspired by [AgentKit](https:/
 > Ponytail fast-paths (`cook`, `fix`…) with handoff points to the full official workflows (`ak:test`, `ak:code-review`,
 > `ak:security-scan`…). Skill slugs are bare (`cook`, not `ak:cook`), so triggers stay distinct from official
 > `/ak:cook`-style invocations when both are installed. The `scientist` kit is fully custom (no official counterpart).
-> Verified primary runtime: **Gemini/Antigravity**. See §6 Support matrix.
+> Primary runtime: **Gemini CLI (smoke-tested)**; Antigravity remains best-effort. See §6 Support matrix.
 
 Engineered with **Ponytail mode** (YAGNI, minimal footprint, standard library first) and **ADHD communication style** (next action first, zero filler, state restatement).
 
@@ -52,8 +52,15 @@ agentkit/
 │   │   └── claude/gemini-snippet.json  # runtime wiring (see engineer/hooks/WIRING.md)
 │   └── templates/              # manifest.template.json, data_contract.template.json
 │
-└── eval/                       # 3-Tier Native Python Evaluation Suite (stdlib only, zero-cost)
-    └── evaluator.py            # --kits-dir, --strict, scaffold e2e, guard.sh execution
+└── eval/                       # Native Python validation and evaluation tools (stdlib only)
+    ├── evaluator.py            # Three-tier kit checks, scaffold/install e2e
+    ├── runtime_smoke.py        # Isolated CLI discovery checks
+    ├── skill_cases.json        # Deterministic artifact-evaluation corpus
+    ├── skill_outcome.py        # Offline artifact grader
+    ├── test_skill_outcome.py   # Grader contract tests
+    ├── docs_consistency.py     # Manifest, README, and local-link drift check
+    ├── test_docs_consistency.py # Drift-check tests
+    └── test_ocr_review_doctrine.py # OCR consent/fallback tests
 ```
 
 ---
@@ -79,11 +86,12 @@ cd ~/.local/share/agent-kits
 
 This will:
 1. Link `agent-init-project` and `ak-eval` to `~/.local/bin/`.
-2. Link skills to detected runtime dirs (`~/.gemini/config/skills/`, `~/.claude/skills/`, `~/.config/opencode/skills/`, `~/.agents/skills/` for Codex user scope). Missing runtimes are skipped (degraded mode OK).
+2. Link skills to detected runtime dirs (`~/.gemini/skills/` for Gemini CLI, `~/.gemini/config/skills/` for Antigravity, `~/.claude/skills/`, `~/.config/opencode/skills/`, `~/.agents/skills/` for Codex user scope). Missing runtimes are skipped (degraded mode OK).
 3. Back up (never overwrite) foreign content under `~/.agentkit-backups/<timestamp>/` and print the recovery path.
 4. Run the complete 3-Tier verification suite (`ak-eval --all --kits-dir .`).
 
-Optional deps (degraded mode OK if missing): `gitnexus`, `rtk`, Engram MCP (`mem_*`), `specify`, `ak` CLI.
+Optional deps (degraded mode OK if missing): `gitnexus`, `rtk`, Engram MCP (`mem_*`), `specify`, `ak` CLI, and `ocr`.
+`ocr` availability checks only its version; review sends diffs to a configured LLM provider only after explicit per-review approval and a positive token budget. Secret-bearing inputs are skipped, and OCR never owns the verdict.
 `guard.sh` is an **advisory** screen (fail-open): it never replaces runtime permissions — a hook file alone does not
 prove any runtime registered or executed it.
 
@@ -181,9 +189,30 @@ ak-eval --all --kits-dir ~/.local/share/agent-kits
 ./eval/evaluator.py --all --kits-dir .
 ```
 
-- **Tier 1 (Static Gate)**: `kit.yaml` versions, frontmatter, skill structure (Protocol+Hard Rules+Deliverable/Verdict/Handoff), writing quality per `docs/skill-standard.md` (trigger branches, completion criteria, Redact rule, ≥3 concrete commands, identifier shape, no placeholders), agent schema v2 (`self_challenge`, inputs/outputs/budgets/delegation), executable `guard.sh` + valid wiring snippets + advisory/fail-open doctrine.
+- **Tier 1 (Static Gate)**: `kit.yaml` versions, frontmatter, skill structure (Protocol+Hard Rules+Deliverable/Verdict/Handoff), per-stage approval checkpoint, optional OCR consent/non-blocking doctrine, writing quality per `docs/skill-standard.md` (trigger branches, completion criteria, Redact rule, ≥3 concrete commands, identifier shape, no placeholders), agent schema v2 (`self_challenge`, inputs/outputs/budgets/delegation), executable `guard.sh` + valid wiring snippets + advisory/fail-open doctrine.
+- **Docs consistency**: `python eval/docs_consistency.py` checks manifest exports against files, README inventory/runtime claims, and local Markdown links.
 - **Tier 2 (Execution Gate)**: Executes real `guard.sh` (incl. bypass variants like `sudo rm -rf /`, `--force-with-lease`), temporal leakage check, HMAC-SHA256 tamper detection, plus `agent-init-project` scaffold e2e (contracts + `CONTEXT.md`/ADR template exist, no hardcoded home path, `.agents/skills` avoided, invalid role rejected) and `install.sh` lifecycle e2e on a throwaway HOME (install → doctor → uninstall, foreign content backed up).
-- **Tier 3 (Cognitive Grading Gate)**: Scores agents on Role Clarity / Refusals / Ponytail+Rubric. Target ≥90% (v2.1 ships at 100%, 135/135).
+- **Tier 3 (Cognitive Grading Gate)**: Scores agents on Role Clarity / Refusals / Ponytail+Rubric. Target ≥90% (v2.1 ships at 100%, 135/135). This prompt rubric is not independent evidence of task outcomes.
+
+Runtime discovery smoke (no model calls; temporary HOME only):
+
+```bash
+python eval/runtime_smoke.py --runtime all
+# Require each selected runtime to expose a non-interactive discovery result:
+python eval/runtime_smoke.py --runtime all --require-discovery
+```
+
+Gemini CLI, OpenCode, and Codex expose safe local discovery surfaces. Claude Code has no non-interactive skill inventory command, so it reports `UNVERIFIED` after checking its isolated skill path and `claude doctor`; confirm Claude skill discovery in a session with `/skills`. Missing CLIs report `SKIP`. File presence alone is never reported as runtime discovery.
+
+Skill outcome evaluation uses a small offline corpus and never starts a model:
+
+```bash
+python eval/skill_outcome.py --list
+python -m unittest eval/test_skill_outcome.py
+python eval/skill_outcome.py engineer-review-idor /path/to/scrubbed-review.md --runtime gemini --model '<model-id>'
+```
+
+Grader fixtures test only the checker. Real agent runs are manual and their results are reported separately; see [`docs/skill-lifecycle.md`](docs/skill-lifecycle.md) for the scrubbed audit → approved diff → regression check process.
 
 ---
 
@@ -198,7 +227,8 @@ ak-eval --all --kits-dir ~/.local/share/agent-kits
 
 | Runtime | Status | Notes |
 |---|---|---|
-| Gemini / Antigravity (`~/.gemini/config/skills/`) | **Verified (primary)** | Trigger = skill dir name (`cook`, `data-audit`, …). Coexists with other skills. Hook wiring snippet provided (`hooks/gemini-snippet.json`); verify block signaling per `hooks/WIRING.md` before relying on it. |
+| Gemini CLI (`~/.gemini/skills/`) | **Smoke-tested (primary)** | Installer targets Gemini CLI discovery and retains the Antigravity location. Trigger = skill dir name. Safe inventory check: `gemini skills list --all`. Hook signaling still needs runtime-specific verification. |
+| Antigravity (`~/.gemini/config/skills/`) | Best-effort | Installer links this legacy/runtime-specific location too. No safe non-interactive inventory check is available; verify discovery in a live session. |
 | Claude Code (`~/.claude/skills/`) | Best-effort | Symlinked bare names (`/cook`), distinct from official `/ak:cook`. No plugin delivery. Hook snippet provided (`hooks/claude-snippet.json`). |
 | OpenCode (`~/.config/opencode/skills/`) | Best-effort | Same symlink layout; verify discovery per version. |
 | Codex (`~/.agents/skills/` user scope) | Supported | Same symlink layout; `doctor` verifies. Shares `.agents/` parent harmlessly with scaffolded project files (different paths). |

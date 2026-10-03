@@ -8,6 +8,7 @@ description: "Implement one approved plan phase with surgical minimal edits. Use
 Execute the plan order, nothing else. Unplanned scope discovered mid-flight goes back to `plan` — it never sneaks into the diff.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **PLAN-BOUND**: If code isn't in the approved phase, don't write it (YAGNI). New scope → stop, replan.
 - **STANDARD LIBRARY FIRST**: Prefer builtins over new deps; <20 lines of stdlib beats a dependency.
 - **ATOMIC EXECUTION**: One checklist item at a time; no multi-file refactor leaps without per-item verification.

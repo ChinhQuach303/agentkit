@@ -8,6 +8,7 @@ description: "Prove a change works with tests at confirmed seams plus a blast-ra
 Proof, not assertion: code is broken until a run says otherwise. Tests verify behavior through public interfaces; the blast-radius check proves nothing else moved.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **EVIDENCE BEFORE ASSERTIONS**: Never claim code works without showing run output.
 - **SEAMS FIRST**: No test at an unconfirmed seam (see `seam-guide.md`).
 - **GRAPH INTEGRITY CHECK**: Run `gitnexus detect-changes --scope all --repo .` before commit when available; otherwise `git status --short && git diff --stat` (degraded mode OK).

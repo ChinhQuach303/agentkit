@@ -8,6 +8,7 @@ description: "Profile then vectorize a slow or memory-hungry pipeline step. Use 
 Optimize the measured bottleneck, not the guessed one. Every change carries before/after numbers or it didn't happen.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **PROFILE FIRST**: No rewrite without a baseline (plan output, timing, peak RAM). Guessed hotspots stay untouched.
 - **VECTORIZE, DON'T LOOP**: No row iteration (`iterrows`, Python loops) — native `polars` (`select`, `with_columns`, `group_by`) or set-based SQL.
 - **LAZY BY DEFAULT**: `pl.scan_parquet()` / `pl.scan_csv()` over eager reads; materialize only at sinks and process boundaries.

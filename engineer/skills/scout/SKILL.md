@@ -8,6 +8,7 @@ description: "Map the symbols, flows, and blast radius behind a change question 
 Answer "what/where/how-risky" with call-graph evidence, never edits. Text search alone is a guess: ground every claim in a trace.
 
 ## Hard Rules
+- **STAGE CHECKPOINT**: After each numbered protocol stage, report its result and evidence; wait for explicit approval before the next stage or skill handoff. Starting this skill approves only stage 1.
 - **ZERO CODE MODIFICATIONS**: Never create, edit, or delete source files during this phase.
 - **TRACE OR IT DIDN'T HAPPEN**: Every usage claim cites a caller chain; uncalled ≠ dead (check dynamic dispatch, public API, runtime wiring).
 
